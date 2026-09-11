@@ -118,5 +118,285 @@
     "points": 10,
     "photo": "mariendom.jpg",
     "window": null
+  },
+  {
+    "id": "lichtbrunnen",
+    "name": {
+      "en": "Lichtbrunnen",
+      "de": "Lichtbrunnen"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30588698,
+    "lng": 14.2844544,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "lichtbrunnen.jpg",
+    "window": null
+  },
+  {
+    "id": "jku-campus",
+    "name": {
+      "en": "JKU Campus",
+      "de": "JKU Campus"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.33735996,
+    "lng": 14.3207993,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "jku-campus.jpg",
+    "window": null
+  },
+  {
+    "id": "musiktheater",
+    "name": {
+      "en": "Musiktheater Linz",
+      "de": "Musiktheater Linz"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.2940962,
+    "lng": 14.29239239,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "musiktheater.jpg",
+    "window": null
+  },
+  {
+    "id": "stadion",
+    "name": {
+      "en": "Stadion Linz",
+      "de": "Stadion Linz"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.29444229,
+    "lng": 14.27467539,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "stadion.jpg",
+    "window": null
+  },
+  {
+    "id": "danube-1",
+    "name": {
+      "en": "Danube 1",
+      "de": "Donau 1"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30432458,
+    "lng": 14.3329427,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "danube-1.jpg",
+    "window": null
+  },
+  {
+    "id": "danube-2",
+    "name": {
+      "en": "Danube 2",
+      "de": "Donau 2"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30821546,
+    "lng": 14.28465277,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "danube-2.jpg",
+    "window": null
+  },
+  {
+    "id": "colorful-houses",
+    "name": {
+      "en": "Colorful Houses",
+      "de": "Bunte Häuser"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30625858,
+    "lng": 14.27456006,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "colorful-houses.jpg",
+    "window": null
+  },
+  {
+    "id": "saeulentempel",
+    "name": {
+      "en": "Säulentempel",
+      "de": "Säulentempel"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.29562696,
+    "lng": 14.27977906,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "saeulentempel.jpg",
+    "window": null
+  },
+  {
+    "id": "botanic-garden",
+    "name": {
+      "en": "Botanic Garden",
+      "de": "Botanischer Garten"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.29385941,
+    "lng": 14.28350248,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "botanic-garden.jpg",
+    "window": null
+  },
+  {
+    "id": "danube-3",
+    "name": {
+      "en": "Danube 3",
+      "de": "Donau 3"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.31767146,
+    "lng": 14.29882096,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "danube-3.jpg",
+    "window": null
+  },
+  {
+    "id": "schauspielhaus",
+    "name": {
+      "en": "Schauspielhaus",
+      "de": "Schauspielhaus"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30389964,
+    "lng": 14.28396854,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "schauspielhaus.jpg",
+    "window": null
+  },
+  {
+    "id": "schlossberg-1",
+    "name": {
+      "en": "Schlossberg 1",
+      "de": "Schlossberg 1"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30548001,
+    "lng": 14.28120867,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "schlossberg-1.jpg",
+    "window": null
+  },
+  {
+    "id": "schlossberg-2",
+    "name": {
+      "en": "Schlossberg 2",
+      "de": "Schlossberg 2"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30565135,
+    "lng": 14.2813574,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "schlossberg-2.jpg",
+    "window": null
+  },
+  {
+    "id": "drehstein",
+    "name": {
+      "en": "Drehstein",
+      "de": "Drehstein"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30280652,
+    "lng": 14.2884236,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "drehstein.jpg",
+    "window": null
   }
 ]
