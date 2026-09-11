@@ -2,7 +2,7 @@ import React from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import type { Spot } from '../data/types';
-import { initialRegion } from '../logic/region';
+import { initialRegion } from '../verify/region';
 
 // Single component wrapping react-native-maps so a later MapLibre swap stays contained (ADR-0001).
 const PIN_FREE = '#9e9e9e';
