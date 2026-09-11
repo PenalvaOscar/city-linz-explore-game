@@ -7,3 +7,4 @@ node_modules/
 dist/
 .next/
 docs/map/*.tif
+data/photos-original/
