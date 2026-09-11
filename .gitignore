@@ -8,3 +8,4 @@ dist/
 .next/
 docs/map/*.tif
 data/photos-original/
+supabase/.temp/
