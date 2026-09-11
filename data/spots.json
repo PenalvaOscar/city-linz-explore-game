@@ -398,5 +398,85 @@
     "points": 10,
     "photo": "drehstein.jpg",
     "window": null
+  },
+  {
+    "id": "grand-garage",
+    "name": {
+      "en": "Grand Garage",
+      "de": "Grand Garage"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.3124394,
+    "lng": 14.2993076,
+    "heading": 52,
+    "kind": "gem",
+    "points": 30,
+    "photo": "grand-garage.jpg",
+    "window": null
+  },
+  {
+    "id": "the-robot",
+    "name": {
+      "en": "The Robot",
+      "de": "The Robot"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.3124648,
+    "lng": 14.2993062,
+    "heading": 23,
+    "kind": "gem",
+    "points": 30,
+    "photo": "the-robot.jpg",
+    "window": null
+  },
+  {
+    "id": "casablanca",
+    "name": {
+      "en": "Casablanca",
+      "de": "Casablanca"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.3120697,
+    "lng": 14.2994024,
+    "heading": 125,
+    "kind": "gem",
+    "points": 30,
+    "photo": "casablanca.jpg",
+    "window": null
+  },
+  {
+    "id": "uni-box",
+    "name": {
+      "en": "Uni Box",
+      "de": "Uni Box"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.3124023,
+    "lng": 14.2989859,
+    "heading": 325,
+    "kind": "gem",
+    "points": 30,
+    "photo": "uni-box.jpg",
+    "window": null
   }
 ]

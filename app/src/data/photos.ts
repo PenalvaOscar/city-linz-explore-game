@@ -2,11 +2,13 @@
 export const photos: Record<string, number> = {
   'ars-electronica.jpg': require('../../../data/photos/ars-electronica.jpg'),
   'botanic-garden.jpg': require('../../../data/photos/botanic-garden.jpg'),
+  'casablanca.jpg': require('../../../data/photos/casablanca.jpg'),
   'colorful-houses.jpg': require('../../../data/photos/colorful-houses.jpg'),
   'danube-1.jpg': require('../../../data/photos/danube-1.jpg'),
   'danube-2.jpg': require('../../../data/photos/danube-2.jpg'),
   'danube-3.jpg': require('../../../data/photos/danube-3.jpg'),
   'drehstein.jpg': require('../../../data/photos/drehstein.jpg'),
+  'grand-garage.jpg': require('../../../data/photos/grand-garage.jpg'),
   'grottenbahn.jpg': require('../../../data/photos/grottenbahn.jpg'),
   'jku-campus.jpg': require('../../../data/photos/jku-campus.jpg'),
   'lentos.jpg': require('../../../data/photos/lentos.jpg'),
@@ -20,4 +22,6 @@ export const photos: Record<string, number> = {
   'schlossberg-1.jpg': require('../../../data/photos/schlossberg-1.jpg'),
   'schlossberg-2.jpg': require('../../../data/photos/schlossberg-2.jpg'),
   'stadion.jpg': require('../../../data/photos/stadion.jpg'),
+  'the-robot.jpg': require('../../../data/photos/the-robot.jpg'),
+  'uni-box.jpg': require('../../../data/photos/uni-box.jpg'),
 };
