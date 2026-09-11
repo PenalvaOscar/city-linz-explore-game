@@ -22,7 +22,8 @@ type Props = {
 
 export function SpotMap({ spots, holdings, showsUserLocation, position, onSelect }: Props) {
   const webview = useRef<WebView>(null);
-  const [loaded, setLoaded] = useState(false);
+  // Set by the page's own `ready` message, not onLoadEnd, so injected calls never race the inline script.
+  const [ready, setReady] = useState(false);
 
   const pins: MapPin[] = useMemo(
     () => spots.map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, color: pinColor[pinState(s, holdings, NO_PLAYER)] })),
@@ -36,12 +37,12 @@ export function SpotMap({ spots, holdings, showsUserLocation, position, onSelect
   );
 
   useEffect(() => {
-    if (loaded) webview.current?.injectJavaScript(`window.setPins(${JSON.stringify(pins)}); true;`);
-  }, [loaded, pins]);
+    if (ready) webview.current?.injectJavaScript(`window.setPins(${JSON.stringify(pins)}); true;`);
+  }, [ready, pins]);
 
   useEffect(() => {
-    if (loaded) webview.current?.injectJavaScript(`window.setPlayer(${JSON.stringify(player)}); true;`);
-  }, [loaded, player]);
+    if (ready) webview.current?.injectJavaScript(`window.setPlayer(${JSON.stringify(player)}); true;`);
+  }, [ready, player]);
 
   return (
     <WebView
@@ -49,11 +50,13 @@ export function SpotMap({ spots, holdings, showsUserLocation, position, onSelect
       style={StyleSheet.absoluteFill}
       source={{ html }}
       originWhitelist={['*']}
-      onLoadEnd={() => setLoaded(true)}
       onMessage={(e) => {
         const msg = parseMapMessage(e.nativeEvent.data);
         if (!msg) return;
-        onSelect(msg.type === 'select' ? (spots.find((s) => s.id === msg.id) ?? null) : null);
+        if (msg.type === 'ready') setReady(true);
+        else if (msg.type === 'select') onSelect(spots.find((s) => s.id === msg.id) ?? null);
+        else if (msg.type === 'deselect') onSelect(null);
+        else console.warn(`SpotMap.android page error: ${msg.message}`);
       }}
       setSupportMultipleWindows={false}
       overScrollMode="never"

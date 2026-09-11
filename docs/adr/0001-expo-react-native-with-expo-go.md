@@ -16,5 +16,6 @@ The product must be a phone app, not a website, but the development Mac has no X
 ## Consequences
 
 - Map is `react-native-maps` (works in Expo Go without a key). MapLibre is the better long-term choice and should be revisited when a dev build exists; keep the map behind one `<SpotMap>` component so the swap is contained.
+  - **Amended 11 Sept 2026 (issue #4):** the no-key claim holds on iOS only. Expo Go's embedded Google Maps key is rejected on SDK 55+, so Android resolves to `SpotMap.android.tsx`: Leaflet + OpenStreetMap tiles inside `react-native-webview` (bundled in Expo Go), same props, attribution "© OpenStreetMap contributors". This is the one WebView code path; it exists because the native path is broken upstream, not as a step towards a web export.
 - **All in on Expo Go for the hackathon (decided 11 Sept 2026).** No web export, no Vercel, no EAS build. Judges see the app on team phones or install Expo Go and scan the QR. Native-only code paths; no `Map.web.tsx`, no compass shim.
 - After the hackathon: web export (`expo export -p web`) is possible from the same codebase with a `Map.web.tsx` (react-leaflet) and a compass shim. An iOS binary needs a paid Apple Developer account; an Android APK needs an EAS cloud build.

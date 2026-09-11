@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import type { Holding, Spot } from '../data/types';
 import type { LatLng } from '../verify/geo';
@@ -25,7 +25,7 @@ export function SpotMap({ spots, holdings, showsUserLocation, onSelect }: Props)
     <MapView
       style={StyleSheet.absoluteFill}
       initialRegion={initialRegion(spots)}
-      mapType={Platform.OS === 'ios' ? 'mutedStandard' : 'standard'}
+      mapType="mutedStandard"
       showsUserLocation={showsUserLocation}
       onPress={() => onSelect(null)}
     >

@@ -25,6 +25,13 @@ describe('buildLeafletPage', () => {
     expect(html).toContain('tile.openstreetmap.org');
     expect(html).not.toContain('navigator.geolocation');
   });
+  it('pins the Leaflet assets with subresource integrity', () => {
+    expect(html).toContain('integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="');
+    expect(html).toContain('integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="');
+  });
+  it('posts ready once the page API exists', () => {
+    expect(html.indexOf('window.setPins = ')).toBeLessThan(html.indexOf("type: 'ready'"));
+  });
   it('does not break out of the script tag when a pin id contains one', () => {
     const evil = buildLeafletPage({
       pins: [{ id: '</script><script>alert(1)', lat: 0, lng: 0, color: '#000' }],
@@ -41,6 +48,14 @@ describe('parseMapMessage', () => {
   });
   it('parses a map tap', () => {
     expect(parseMapMessage('{"type":"deselect"}')).toEqual({ type: 'deselect' });
+  });
+  it('parses ready and error signals', () => {
+    expect(parseMapMessage('{"type":"ready"}')).toEqual({ type: 'ready' });
+    expect(parseMapMessage('{"type":"error","message":"L is not defined"}')).toEqual({
+      type: 'error',
+      message: 'L is not defined',
+    });
+    expect(parseMapMessage('{"type":"error"}')).toBeNull();
   });
   it('ignores malformed or unknown payloads', () => {
     expect(parseMapMessage('not json')).toBeNull();

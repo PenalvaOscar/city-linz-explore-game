@@ -88,5 +88,5 @@ CONTEXT.md      glossary
 - Android EXIF often lacks heading → CSV column is the source of truth.
 - Venue Wi-Fi may block phone↔laptop → `npx expo start --tunnel`.
 - Indoor GPS won't settle → all spots outdoors; demo video as backup.
-- Google Maps on a standalone Android build needs a key; Expo Go doesn't. Only matters after the hackathon.
+- Google Maps on Android needs a key even in Expo Go (SDK 55+ rejects the embedded one, issue #4) → Android uses a Leaflet/OSM WebView; needs network for Leaflet from the CDN and for tiles.
 - Supabase anon key ships in the app bundle with RLS off; acceptable for a demo, not beyond it.

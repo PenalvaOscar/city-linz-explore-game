@@ -5,11 +5,18 @@ import type { Bounds } from '../verify/region';
 
 export type MapPin = { id: string; lat: number; lng: number; color: string };
 
-export type MapMessage = { type: 'select'; id: string } | { type: 'deselect' };
+export type MapMessage =
+  | { type: 'ready' }
+  | { type: 'select'; id: string }
+  | { type: 'deselect' }
+  | { type: 'error'; message: string };
 
 type PageInput = { pins: MapPin[]; bounds: Bounds; playerColor: string };
 
+// Pinned build; hashes computed from the unpkg files, and identical to the ones on leafletjs.com/download.
 const LEAFLET_VERSION = '1.9.4';
+const LEAFLET_CSS_SRI = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+const LEAFLET_JS_SRI = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
 
 /** JSON that is safe to inline inside a `<script>` block. */
 const inlineJson = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
@@ -20,8 +27,8 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.css" integrity="${LEAFLET_CSS_SRI}" crossorigin="" />
+<script src="https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.js" integrity="${LEAFLET_JS_SRI}" crossorigin=""></script>
 <style>
   html, body, #map { margin: 0; padding: 0; height: 100%; width: 100%; background: #FAFAFC; }
   .pin { width: 26px; height: 36px; }
@@ -31,6 +38,8 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
 <div id="map"></div>
 <script>
   var post = function (msg) { window.ReactNativeWebView.postMessage(JSON.stringify(msg)); };
+  // A failed CDN load (venue Wi-Fi) would otherwise reproduce the blank map this page replaces, silently.
+  window.onerror = function (message) { post({ type: 'error', message: String(message) }); };
   var map = L.map('map', { attributionControl: false, zoomControl: false });
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
   map.fitBounds(${inlineJson(bounds)});
@@ -73,6 +82,7 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
   };
 
   window.setPins(${inlineJson(pins)});
+  post({ type: 'ready' });
 </script>
 </body>
 </html>`;
@@ -87,8 +97,10 @@ export function parseMapMessage(raw: string): MapMessage | null {
     return null;
   }
   if (typeof data !== 'object' || data === null) return null;
-  const msg = data as { type?: unknown; id?: unknown };
+  const msg = data as { type?: unknown; id?: unknown; message?: unknown };
+  if (msg.type === 'ready') return { type: 'ready' };
   if (msg.type === 'deselect') return { type: 'deselect' };
   if (msg.type === 'select' && typeof msg.id === 'string') return { type: 'select', id: msg.id };
+  if (msg.type === 'error' && typeof msg.message === 'string') return { type: 'error', message: msg.message };
   return null;
 }
