@@ -1,43 +1,76 @@
--- Zwergerl hackathon schema. Run once in the Supabase SQL editor.
--- RLS is off for the hackathon (ADR-0003); the anon key can read and write everything.
+-- Zwergerl hackathon schema
+-- Paste the whole file into Supabase → SQL Editor → Run.
+-- Safe to re-run: drops and recreates everything.
 
-create table if not exists players (
-  id          uuid primary key,                  -- generated on the device, stored locally
-  name        text not null,
-  created_at  timestamptz not null default now()
+drop view if exists leaderboard;
+drop table if exists claims;
+drop table if exists holdings;
+
+-- ---------------------------------------------------------------
+-- claims: every attempt, passed or failed. This is your real data.
+-- ---------------------------------------------------------------
+create table claims (
+  id            uuid primary key default gen_random_uuid(),
+  gem_id        text        not null,
+  player        text        not null,
+  points        int         not null default 0,
+  passed        boolean     not null default true,
+  distance_m    real,
+  heading_delta real,
+  gps_accuracy  real,
+  dwell_seconds int,
+  photo_url     text,
+  created_at    timestamptz not null default now()
 );
 
-create table if not exists claims (
-  id          uuid primary key default gen_random_uuid(),
-  spot_id     text not null,                     -- matches data/spots.json id
-  player_id   uuid not null references players (id),
-  photo_url   text,                              -- public URL in the "photos" bucket
-  lat         double precision not null,
-  lng         double precision not null,
-  accuracy_m  double precision,
-  heading     double precision,
-  distance_m  double precision,                  -- computed on device at claim time
-  heading_diff double precision,
-  created_at  timestamptz not null default now()
+create index claims_gem_idx    on claims (gem_id);
+create index claims_player_idx on claims (player);
+create index claims_time_idx   on claims (created_at desc);
+
+-- ---------------------------------------------------------------
+-- holdings: who owns what right now. One row per gem.
+-- A new claim overwrites the row — that is the steal.
+-- ---------------------------------------------------------------
+create table holdings (
+  gem_id     text primary key,
+  player     text        not null,
+  held_since timestamptz not null default now()
 );
 
-create index if not exists claims_spot_created_idx on claims (spot_id, created_at desc);
+-- ---------------------------------------------------------------
+-- leaderboard: a view, not a table. Never gets out of sync.
+-- ---------------------------------------------------------------
+create view leaderboard as
+select
+  player,
+  sum(points)              as points,
+  count(*)                 as claims,
+  max(created_at)          as last_claim
+from claims
+where passed
+group by player
+order by points desc;
 
--- Current owner of each spot = most recent claim. Decay is computed on the device
--- from created_at (DECAY_DAYS); a decayed spot simply shows as free.
-create or replace view current_owners as
-select distinct on (c.spot_id)
-  c.spot_id,
-  c.player_id,
-  p.name        as player_name,
-  c.photo_url,
-  c.heading,
-  c.created_at  as claimed_at
-from claims c
-join players p on p.id = c.player_id
-order by c.spot_id, c.created_at desc;
+-- ---------------------------------------------------------------
+-- Open access. There is no auth in this build, so RLS must allow
+-- anonymous reads and writes or every insert fails silently.
+-- This is fine for one day. Do not ship it.
+-- ---------------------------------------------------------------
+alter table claims   enable row level security;
+alter table holdings enable row level security;
 
--- Leaderboard = sum of points of currently owned spots. Points live in spots.json,
--- so the app joins current_owners with its bundled spots; no spots table needed yet.
+create policy claims_open   on claims   for all using (true) with check (true);
+create policy holdings_open on holdings for all using (true) with check (true);
 
--- Storage: create a PUBLIC bucket named "photos" in Dashboard -> Storage.
+-- ---------------------------------------------------------------
+-- Two demo rows so the leaderboard is not empty on first load.
+-- Delete before the pitch.
+-- ---------------------------------------------------------------
+insert into claims (gem_id, player, points, distance_m, heading_delta, dwell_seconds)
+values
+  ('klosterhof', 'lena', 30, 22.4, 11.0, 21),
+  ('hofgasse',   'tobi', 18, 31.8, 24.5, 19);
+
+insert into holdings (gem_id, player) values
+  ('klosterhof', 'lena'),
+  ('hofgasse',   'tobi');
