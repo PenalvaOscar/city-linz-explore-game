@@ -8,6 +8,11 @@ export const theme = {
   text: '#1A1A1A',
   muted: '#666666',
   white: '#FFFFFF',
+  surface: 'rgba(255,255,255,0.92)',
+  border: '#E3E6EE',
+  badgePoints: '#FFF4B8',
+  badgeOwnership: '#E8EDFB',
+  disabledOpacity: 0.45,
 } as const;
 
 /** The only mapping from pin state to colour; components must not decide colours themselves. */

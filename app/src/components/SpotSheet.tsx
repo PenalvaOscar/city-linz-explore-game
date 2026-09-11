@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Holding, Spot } from '../data/types';
 import { photos } from '../data/photos';
@@ -16,29 +16,54 @@ type Props = {
   onClose: () => void;
 };
 
+const STORY_PREVIEW_LINES = 3;
+
 export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose }: Props) {
+  const [expanded, setExpanded] = useState(false);
   const state = pinState(spot, holdings, NO_PLAYER);
   const owner = holdings.find((h) => h.spot_id === spot.id)?.player ?? null;
   const distance = position ? distanceM(position, spot) : null;
   const heading = spot.heading === null ? t('headingUnknown') : `${Math.round(spot.heading)}°`;
+  const story = spot.story.en;
 
   return (
     <View style={styles.card}>
-      <Image source={photos[spot.photo]} style={styles.photo} resizeMode="cover" />
       <Pressable onPress={onClose} style={styles.close} accessibilityLabel={t('close')} hitSlop={12}>
         <Text style={styles.closeText}>×</Text>
       </Pressable>
-      <View style={styles.body}>
-        <View style={styles.titleRow}>
+      <View style={styles.headerRow}>
+        <Image source={photos[spot.photo]} style={styles.photo} resizeMode="cover" />
+        <View style={styles.titleColumn}>
           <Text style={styles.name}>{spot.name.en}</Text>
-          <Text style={styles.points}>{spot.points} {t('points')}</Text>
+          {spot.teaser.en ? <Text style={styles.teaser}>{spot.teaser.en}</Text> : null}
         </View>
-        {spot.teaser.en ? <Text style={styles.teaser}>{spot.teaser.en}</Text> : null}
-        <Text style={styles.meta}>{ownershipLabel(state, owner, holdingsAvailable)}</Text>
-        <Text style={styles.meta}>{formatDistance(distance)} · {heading}</Text>
+      </View>
+      {story ? (
+        <Text style={styles.story} numberOfLines={expanded ? undefined : STORY_PREVIEW_LINES}>
+          {story}
+        </Text>
+      ) : null}
+      <View style={styles.badgeRow}>
+        <Text style={[styles.badge, styles.pointsBadge]}>{spot.points} {t('points')}</Text>
+        <Text style={[styles.badge, styles.ownershipBadge]}>
+          {ownershipLabel(state, owner, holdingsAvailable)}
+        </Text>
+      </View>
+      <Text style={styles.meta}>{formatDistance(distance)} · {heading}</Text>
+      <View style={styles.buttonRow}>
         <View style={styles.claim} accessibilityRole="button" accessibilityState={{ disabled: true }}>
           <Text style={styles.claimText}>{t('claim')}</Text>
         </View>
+        {story ? (
+          <Pressable
+            onPress={() => setExpanded((e) => !e)}
+            style={styles.moreInfo}
+            accessibilityRole="button"
+            accessibilityState={{ expanded }}
+          >
+            <Text style={styles.moreInfoText}>{t('moreInfo')}</Text>
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );
@@ -52,47 +77,62 @@ const styles = StyleSheet.create({
     bottom: 48,
     backgroundColor: theme.white,
     borderRadius: 16,
-    overflow: 'hidden',
+    padding: 14,
+    gap: 10,
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
     elevation: 6,
   },
-  photo: { width: '100%', height: 180 },
   close: {
     position: 'absolute',
     top: 8,
     right: 8,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 1,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: theme.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  closeText: { color: theme.white, fontSize: 20, lineHeight: 22 },
-  body: { padding: 14, gap: 6 },
-  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  name: { fontSize: 20, fontWeight: '700', color: theme.text, flexShrink: 1 },
-  points: {
-    backgroundColor: theme.accentYellow,
-    color: theme.text,
+  closeText: { color: theme.text, fontSize: 18, lineHeight: 20 },
+  headerRow: { flexDirection: 'row', gap: 12, paddingRight: 28 },
+  photo: { width: 96, height: 96, borderRadius: 12 },
+  titleColumn: { flex: 1, justifyContent: 'center', gap: 2 },
+  name: { fontSize: 20, fontWeight: '700', color: theme.text },
+  teaser: { color: theme.muted },
+  story: { color: theme.text, lineHeight: 20 },
+  badgeRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  badge: {
     fontWeight: '700',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
+    fontSize: 13,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
     overflow: 'hidden',
   },
-  teaser: { color: theme.muted },
-  meta: { color: theme.text },
+  pointsBadge: { backgroundColor: theme.badgePoints, color: theme.text },
+  ownershipBadge: { backgroundColor: theme.badgeOwnership, color: theme.primary },
+  meta: { color: theme.muted, fontSize: 13 },
+  buttonRow: { flexDirection: 'row', gap: 10 },
   claim: {
-    marginTop: 8,
+    flex: 1,
     backgroundColor: theme.primary,
-    opacity: 0.4,
+    opacity: theme.disabledOpacity,
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
   },
   claimText: { color: theme.white, fontWeight: '700', fontSize: 16 },
+  moreInfo: {
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: theme.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  moreInfoText: { color: theme.primary, fontWeight: '700', fontSize: 16 },
 });

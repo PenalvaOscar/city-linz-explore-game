@@ -30,9 +30,11 @@ export default function App() {
       />
       <View style={styles.header} pointerEvents="none">
         <Text style={styles.wordmark}>{t('appName')}</Text>
+        <Text style={styles.tagline}>{t('tagline')}</Text>
       </View>
       {selected && (
         <SpotSheet
+          key={selected.id}
           spot={selected}
           holdings={holdings}
           holdingsAvailable={available}
@@ -53,13 +55,15 @@ const styles = StyleSheet.create({
   header: {
     position: 'absolute',
     top: 56,
-    left: 16,
-    backgroundColor: theme.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    left: 12,
+    right: 12,
+    backgroundColor: theme.surface,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
   },
-  wordmark: { color: theme.white, fontWeight: '800', fontSize: 18, letterSpacing: 1 },
+  wordmark: { color: theme.primary, fontWeight: '800', fontSize: 22, letterSpacing: 1 },
+  tagline: { color: theme.text, fontSize: 14, marginTop: 2 },
   attribution: {
     position: 'absolute',
     bottom: 24,
