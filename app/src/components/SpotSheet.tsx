@@ -4,7 +4,7 @@ import type { Holding, Spot } from '../data/types';
 import { photos } from '../data/photos';
 import { formatDistance, ownershipLabel } from '../verify/format';
 import { distanceM, type LatLng } from '../verify/geo';
-import { pinState } from '../verify/pinState';
+import { NO_PLAYER, pinState } from '../verify/pinState';
 import { t } from '../ui/strings';
 import { theme } from '../ui/theme';
 
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose }: Props) {
-  const state = pinState(spot, holdings, '');
+  const state = pinState(spot, holdings, NO_PLAYER);
   const owner = holdings.find((h) => h.spot_id === spot.id)?.player ?? null;
   const distance = position ? distanceM(position, spot) : null;
   const heading = spot.heading === null ? t('headingUnknown') : `${Math.round(spot.heading)}°`;
@@ -36,7 +36,7 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
         {spot.teaser.en ? <Text style={styles.teaser}>{spot.teaser.en}</Text> : null}
         <Text style={styles.meta}>{ownershipLabel(state, owner, holdingsAvailable)}</Text>
         <Text style={styles.meta}>{formatDistance(distance)} · {heading}</Text>
-        <View style={styles.claim} accessibilityState={{ disabled: true }}>
+        <View style={styles.claim} accessibilityRole="button" accessibilityState={{ disabled: true }}>
           <Text style={styles.claimText}>{t('claim')}</Text>
         </View>
       </View>

@@ -19,6 +19,9 @@ describe('ownershipLabel', () => {
   it('reads unavailable when holdings could not be loaded', () => {
     expect(ownershipLabel('free', null, false)).toBe('Ownership unavailable');
   });
+  it('reads unavailable even with a stale owner after the backend went away', () => {
+    expect(ownershipLabel('theirs', 'lena', false)).toBe('Ownership unavailable');
+  });
   it('reads Free for a free spot', () => {
     expect(ownershipLabel('free', null, true)).toBe('Free');
   });

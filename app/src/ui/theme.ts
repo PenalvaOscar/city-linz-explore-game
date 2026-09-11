@@ -3,12 +3,10 @@ import type { PinState } from '../data/types';
 // linz.at-inspired palette; hex values eyeballed from docs/design (see README there).
 export const theme = {
   primary: '#1E3FAE',
-  accentPink: '#E6007E',
   accentYellow: '#FFD500',
   background: '#FAFAFC',
   text: '#1A1A1A',
   muted: '#666666',
-  border: '#E3E3E8',
   white: '#FFFFFF',
 } as const;
 

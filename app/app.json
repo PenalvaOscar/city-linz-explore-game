@@ -7,10 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true,
-      "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Zwergerl shows your position on the map and the distance to each spot."
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {

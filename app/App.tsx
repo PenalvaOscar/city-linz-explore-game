@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { SpotMap } from './src/components/SpotMap';
+import { MAP_PROVIDER, SpotMap } from './src/components/SpotMap';
 import { SpotSheet } from './src/components/SpotSheet';
 import { spots } from './src/data/spots';
 import type { Spot } from './src/data/types';
 import { useHoldings } from './src/hooks/useHoldings';
-import { useLocation } from './src/hooks/useLocation';
+import { usePosition } from './src/hooks/usePosition';
 import { t } from './src/ui/strings';
 import { theme } from './src/ui/theme';
-
-const MAP_PROVIDER = Platform.OS === 'ios' ? 'Apple Maps' : 'Google Maps';
 
 export default function App() {
   const [selected, setSelected] = useState<Spot | null>(null);
   const { holdings, available, refresh } = useHoldings();
-  const { granted, position } = useLocation();
+  const { granted, position } = usePosition();
 
   useEffect(() => {
     if (selected) refresh();
