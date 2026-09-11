@@ -1,0 +1,21 @@
+import type { PinState } from '../data/types';
+
+// linz.at-inspired palette; hex values eyeballed from docs/design (see README there).
+export const theme = {
+  primary: '#1E3FAE',
+  accentPink: '#E6007E',
+  accentYellow: '#FFD500',
+  background: '#FAFAFC',
+  text: '#1A1A1A',
+  muted: '#666666',
+  border: '#E3E3E8',
+  white: '#FFFFFF',
+} as const;
+
+/** The only mapping from pin state to colour; components must not decide colours themselves. */
+export const pinColor: Record<PinState, string> = {
+  free: '#9E9E9E',
+  mine: theme.primary,
+  theirs: '#D32F2F',
+  gem: '#7B1FA2',
+};
