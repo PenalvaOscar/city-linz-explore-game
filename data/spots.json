@@ -1,0 +1,122 @@
+[
+  {
+    "id": "poestlingberg",
+    "name": {
+      "en": "Pöstlingberg",
+      "de": "Pöstlingberg"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.32393815,
+    "lng": 14.25870585,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "poestlingberg.jpg",
+    "window": null
+  },
+  {
+    "id": "grottenbahn",
+    "name": {
+      "en": "Grottenbahn",
+      "de": "Grottenbahn"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.32424773,
+    "lng": 14.25618554,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "grottenbahn.jpg",
+    "window": null
+  },
+  {
+    "id": "ars-electronica",
+    "name": {
+      "en": "Ars Electronica Center",
+      "de": "Ars Electronica Center"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30962,
+    "lng": 14.28445,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "ars-electronica.jpg",
+    "window": null
+  },
+  {
+    "id": "lentos",
+    "name": {
+      "en": "Lentos Art Museum",
+      "de": "Lentos Kunstmuseum"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30863,
+    "lng": 14.28884,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "lentos.jpg",
+    "window": null
+  },
+  {
+    "id": "pestsaeule",
+    "name": {
+      "en": "Trinity Column",
+      "de": "Pestsäule"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.30601368,
+    "lng": 14.28628506,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "pestsaeule.jpg",
+    "window": null
+  },
+  {
+    "id": "mariendom",
+    "name": {
+      "en": "New Cathedral",
+      "de": "Mariendom"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.3005623,
+    "lng": 14.28674828,
+    "heading": null,
+    "kind": "linz",
+    "points": 10,
+    "photo": "mariendom.jpg",
+    "window": null
+  }
+]

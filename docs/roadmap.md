@@ -12,7 +12,7 @@ Two blocks: today 14:20–18:00, tomorrow 09:30–14:00. Three lanes, fixed inte
 
 Interfaces, frozen now:
 
-- **B → A**: `app/assets/spots.json`, schema below.
+- **B → A**: `data/spots.json` + `data/photos/<id>.jpg`, schema below. Photos are 1024 px JPEG, ASCII slugs only (no umlauts, no uppercase).
 - **C → A**: `evaluateClaim(spot, reading): ClaimResult` with `{ pass, distanceM, headingDiff, gates: { distance, accuracy, heading, dwell } }`.
 - A stubs both with dummy data until they land.
 
@@ -76,8 +76,8 @@ After the hackathon: web export + Vercel, EAS Android build (ADR-0001).
 ## Repo layout
 
 ```
-app/            Expo project (assets/spots.json, assets/photos/, src/verify/)
-data/           festival export, spots.csv, photos-original/ (gitignored)
+app/            Expo project (src/verify/; imports ../data/spots.json and ../data/photos/)
+data/           festival export, spots.json, photos/ (1024 px JPEG, committed), photos-original/ (gitignored)
 scripts/        build-spots.py, build-gems.py
 docs/           prd.md, roadmap.md, brief/, adr/
 CONTEXT.md      glossary
