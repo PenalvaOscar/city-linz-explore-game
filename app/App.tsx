@@ -12,7 +12,7 @@ export default function App() {
       <SpotMap spots={spots} />
       <View style={styles.attribution} pointerEvents="none">
         <Text style={styles.attributionText}>
-          Data: Ars Electronica Festival 2026 · Stadt Linz · Map: {MAP_PROVIDER}
+          Data: Ars Electronica Festival 2026 · Stadt Linz (CC-BY) · Map: {MAP_PROVIDER}
         </Text>
       </View>
       <StatusBar style="dark" />
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   attribution: {
     position: 'absolute',
     bottom: 24,
-    left: 8,
+    right: 8,
     backgroundColor: 'rgba(255,255,255,0.75)',
     paddingHorizontal: 6,
     paddingVertical: 2,
