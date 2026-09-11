@@ -13,6 +13,9 @@ export const theme = {
   badgePoints: '#FFF4B8',
   badgeOwnership: '#E8EDFB',
   disabledOpacity: 0.45,
+  success: '#2E7D32',
+  error: '#D32F2F',
+  backdrop: 'rgba(0,0,0,0.4)',
 } as const;
 
 /** The only mapping from pin state to colour; components must not decide colours themselves. */

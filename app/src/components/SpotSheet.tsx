@@ -4,7 +4,7 @@ import type { Holding, Spot } from '../data/types';
 import { photos } from '../data/photos';
 import { formatDistance, ownershipLabel } from '../verify/format';
 import { distanceM, type LatLng } from '../verify/geo';
-import { NO_PLAYER, pinState } from '../verify/pinState';
+import { pinState } from '../verify/pinState';
 import { t } from '../ui/strings';
 import { theme } from '../ui/theme';
 
@@ -13,14 +13,20 @@ type Props = {
   holdings: Holding[];
   holdingsAvailable: boolean;
   position: LatLng | null;
+  /** The local player's display name; empty until one is stored. */
+  player: string;
+  /** Claim is enabled only when this is set: the app has a position and the player identity has loaded. */
+  onClaim: (() => void) | null;
+  /** Location permission was refused, so Claim can never enable. */
+  locationDenied: boolean;
   onClose: () => void;
 };
 
 const STORY_PREVIEW_LINES = 3;
 
-export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose }: Props) {
+export function SpotSheet({ spot, holdings, holdingsAvailable, position, player, onClaim, locationDenied, onClose }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const state = pinState(spot, holdings, NO_PLAYER);
+  const state = pinState(spot, holdings, player);
   const owner = holdings.find((h) => h.spot_id === spot.id)?.player ?? null;
   const distance = position ? distanceM(position, spot) : null;
   const heading = spot.heading === null ? t('headingUnknown') : `${Math.round(spot.heading)}°`;
@@ -52,10 +58,11 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
       <Text style={styles.meta}>{formatDistance(distance)} · {heading}</Text>
       <View style={styles.buttonRow}>
         <Pressable
-          disabled
-          style={styles.claim}
+          onPress={onClaim ?? undefined}
+          disabled={onClaim === null}
+          style={[styles.claim, onClaim === null && styles.claimDisabled]}
           accessibilityRole="button"
-          accessibilityState={{ disabled: true }}
+          accessibilityState={{ disabled: onClaim === null }}
         >
           <Text style={styles.claimText}>{t('claim')}</Text>
         </Pressable>
@@ -70,6 +77,7 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
           </Pressable>
         ) : null}
       </View>
+      {locationDenied ? <Text style={styles.hint}>{t('locationNeeded')}</Text> : null}
     </View>
   );
 }
@@ -125,11 +133,12 @@ const styles = StyleSheet.create({
   claim: {
     flex: 1,
     backgroundColor: theme.primary,
-    opacity: theme.disabledOpacity,
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
   },
+  claimDisabled: { opacity: theme.disabledOpacity },
+  hint: { color: theme.muted, fontSize: 13, textAlign: 'center' },
   claimText: { color: theme.white, fontWeight: '700', fontSize: 16 },
   moreInfo: {
     flex: 1,

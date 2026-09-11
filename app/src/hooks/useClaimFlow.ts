@@ -1,0 +1,72 @@
+import { useCallback, useEffect, useReducer } from 'react';
+import { claimSpot } from '../data/claimSpot';
+import type { Spot } from '../data/types';
+import { initialClaimState, transition, type ClaimEvent, type ClaimState } from '../verify/claimMachine';
+import type { Thresholds } from '../verify/thresholds';
+import { useFlowPosition, type PositionSample } from './useFlowPosition';
+import { useHeading } from './useHeading';
+
+type Args = {
+  spot: Spot;
+  /** The stored display name, or null when the flow must ask for it first. */
+  player: string | null;
+  thresholds: Thresholds;
+  /** Fires once the flow reaches `closed` (Back to map from any step). */
+  onClose: () => void;
+  /** Fires after a passing claim is saved, so the map can refresh ownership. */
+  onSaved: () => void;
+};
+
+/**
+ * Drives the claim state machine: feeds it the dedicated position and heading watchers, a 1 s tick
+ * while dwelling, and the `claim_spot` call while evaluating. Holds no rules of its own.
+ */
+export function useClaimFlow({ spot, player, thresholds, onClose, onSaved }: Args) {
+  const [state, dispatch] = useReducer(transition, { spot, thresholds, hasName: player !== null }, initialClaimState);
+
+  const onSample = useCallback((s: PositionSample) => dispatch({ type: 'position', ...s }), []);
+  const onHeading = useCallback((heading: number | null) => dispatch({ type: 'heading', heading }), []);
+  useFlowPosition(onSample);
+  useHeading(onHeading);
+
+  const dwelling = state.step === 'dwelling';
+  useEffect(() => {
+    if (!dwelling) return;
+    const id = setInterval(() => dispatch({ type: 'tick' }), 1000);
+    return () => clearInterval(id);
+  }, [dwelling]);
+
+  const evaluating = state.step === 'evaluating';
+  useEffect(() => {
+    if (!evaluating || !state.reading || !state.result || player === null) return;
+    let cancelled = false;
+    claimSpot({
+      spot_id: spot.id,
+      player,
+      points: spot.points,
+      passed: state.result.pass,
+      distance_m: state.result.distanceM,
+      heading_delta: state.result.headingDiff,
+      gps_accuracy: state.reading.accuracyM,
+      dwell_seconds: state.reading.dwellS,
+    })
+      .then((saved) => {
+        if (cancelled) return;
+        dispatch({ type: 'saved', ...saved });
+        if (state.result?.pass) onSaved();
+      })
+      .catch(() => {
+        if (!cancelled) dispatch({ type: 'saveFailed' });
+      });
+    return () => {
+      cancelled = true;
+    };
+    // The reading and result are frozen while evaluating; only entering the step should send.
+  }, [evaluating]);
+
+  useEffect(() => {
+    if (state.step === 'closed') onClose();
+  }, [state.step, onClose]);
+
+  return { state, dispatch } as { state: ClaimState; dispatch: (e: ClaimEvent) => void };
+}

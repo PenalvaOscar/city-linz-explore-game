@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 import type { LatLng } from '../verify/geo';
 
-export type PositionState = { granted: boolean; position: LatLng | null };
+export type PositionState = { granted: boolean; denied: boolean; position: LatLng | null };
 
 /** Asks for foreground location once; after grant, watches position at low frequency. */
 export function usePosition(): PositionState {
   const [granted, setGranted] = useState(false);
+  const [denied, setDenied] = useState(false);
   const [position, setPosition] = useState<LatLng | null>(null);
 
   useEffect(() => {
@@ -15,7 +16,11 @@ export function usePosition(): PositionState {
 
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (cancelled || status !== 'granted') return;
+      if (cancelled) return;
+      if (status !== 'granted') {
+        setDenied(true);
+        return;
+      }
       setGranted(true);
       const watcher = await Location.watchPositionAsync(
         { accuracy: Location.Accuracy.Balanced, timeInterval: 5000, distanceInterval: 5 },
@@ -34,5 +39,5 @@ export function usePosition(): PositionState {
     };
   }, []);
 
-  return { granted, position };
+  return { granted, denied, position };
 }

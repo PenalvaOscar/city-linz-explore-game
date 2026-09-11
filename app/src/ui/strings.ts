@@ -10,13 +10,54 @@ const strings = {
   headingUnknown: 'heading unknown',
   points: 'pts',
   claim: 'Claim this spot',
+  locationNeeded: 'Location needed to claim',
   moreInfo: 'More info',
   close: 'Close',
   attribution: 'Data: Ars Electronica Festival 2026 · Stadt Linz (CC-BY) ·',
+  // Claim flow
+  backToMap: 'Back to map',
+  namePrompt: 'What should we call you?',
+  nameHint: '1 to 20 characters. Other players see this name on the spots you own.',
+  namePlaceholder: 'Your name',
+  nameConfirm: 'Let’s go',
+  gpsSettling: 'GPS settling…',
+  gpsSettlingHint: 'Waiting for a fix better than {accuracy} m. Head outdoors if this takes long.',
+  walkCloser: 'Walk closer',
+  awayFrom: '{distance} away, get within {range} m of the spot',
+  stayHere: 'Stay here',
+  dwellCountdown: '{seconds} s',
+  dwellHint: 'Keep within {range} m until the camera unlocks',
+  capture: 'Capture',
+  captureHeading: 'Heading: {heading}',
+  captureHeadingNone: 'Heading: no compass reading',
+  captureTarget: 'Reference heading: {heading}',
+  captureTargetNone: 'This spot has no reference heading',
+  saving: 'Checking your claim…',
+  claimed: 'Claimed',
+  reclaimed: 'Reclaimed',
+  stolenFrom: 'Stolen from {name}',
+  pointsHeld: '{points} pts',
+  done: 'Done',
+  notThisTime: 'Not this time',
+  tryAgain: 'Try again',
+  failNearly: 'Nearly: ',
+  failWrongPlace: 'Wrong place: ',
+  failWrongWay: 'Wrong way: ',
+  failDistance: '{distance} m away, get within {range} m',
+  failHeading: '{diff}° off, face within {limit}°',
+  failNoCompass: 'No compass reading, move your phone in a figure eight',
+  failAccuracy: 'GPS accuracy {accuracy} m, needs {limit} m or better',
+  failDwell: 'Stayed {dwell} s, stay at least {limit} s',
+  saveError: 'Couldn’t save your claim',
+  saveErrorHint: 'Your readings are kept. Check your connection and retry.',
+  retry: 'Retry',
 } as const;
 
 export type StringKey = keyof typeof strings;
 
-export function t(key: StringKey): string {
-  return strings[key];
+/** Looks up a string; `{name}` placeholders are replaced from `vars`. */
+export function t(key: StringKey, vars?: Record<string, string | number>): string {
+  const s: string = strings[key];
+  if (!vars) return s;
+  return s.replace(/\{(\w+)\}/g, (match, name: string) => (name in vars ? String(vars[name]) : match));
 }
