@@ -17,6 +17,7 @@ export const photos: Record<string, number> = {
   'musiktheater.jpg': require('../../../data/photos/musiktheater.jpg'),
   'pestsaeule.jpg': require('../../../data/photos/pestsaeule.jpg'),
   'poestlingberg.jpg': require('../../../data/photos/poestlingberg.jpg'),
+  'quadrill.jpg': require('../../../data/photos/quadrill.jpg'),
   'saeulentempel.jpg': require('../../../data/photos/saeulentempel.jpg'),
   'schauspielhaus.jpg': require('../../../data/photos/schauspielhaus.jpg'),
   'schlossberg-1.jpg': require('../../../data/photos/schlossberg-1.jpg'),

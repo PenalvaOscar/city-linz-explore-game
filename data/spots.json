@@ -478,5 +478,25 @@
     "points": 30,
     "photo": "uni-box.jpg",
     "window": null
+  },
+  {
+    "id": "quadrill",
+    "name": {
+      "en": "Quadrill",
+      "de": "Quadrill"
+    },
+    "teaser": {
+      "en": ""
+    },
+    "story": {
+      "en": ""
+    },
+    "lat": 48.3124614,
+    "lng": 14.2991753,
+    "heading": 230,
+    "kind": "gem",
+    "points": 30,
+    "photo": "quadrill.jpg",
+    "window": null
   }
 ]
