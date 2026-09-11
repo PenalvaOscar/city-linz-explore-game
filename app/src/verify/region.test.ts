@@ -1,4 +1,4 @@
-import { initialRegion } from './region';
+import { initialRegion, regionToBounds } from './region';
 
 const pts = [
   { lat: 48.32393815, lng: 14.25870585 },
@@ -26,5 +26,24 @@ describe('initialRegion', () => {
   });
   it('throws on an empty list', () => {
     expect(() => initialRegion([])).toThrow();
+  });
+});
+
+describe('regionToBounds', () => {
+  it('returns [[south, west], [north, east]] around the region centre', () => {
+    const b = regionToBounds({ latitude: 48.3, longitude: 14.28, latitudeDelta: 0.02, longitudeDelta: 0.04 });
+    expect(b[0][0]).toBeCloseTo(48.29, 10);
+    expect(b[0][1]).toBeCloseTo(14.26, 10);
+    expect(b[1][0]).toBeCloseTo(48.31, 10);
+    expect(b[1][1]).toBeCloseTo(14.3, 10);
+  });
+  it('round-trips initialRegion so every spot lies inside the bounds', () => {
+    const [[south, west], [north, east]] = regionToBounds(initialRegion(pts));
+    for (const p of pts) {
+      expect(p.lat).toBeGreaterThan(south);
+      expect(p.lat).toBeLessThan(north);
+      expect(p.lng).toBeGreaterThan(west);
+      expect(p.lng).toBeLessThan(east);
+    }
   });
 });

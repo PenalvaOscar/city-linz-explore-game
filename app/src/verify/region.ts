@@ -21,3 +21,15 @@ export function initialRegion(points: LatLng[]): Region {
     longitudeDelta: Math.max((maxLng - minLng) * PADDING, MIN_DELTA),
   };
 }
+
+export type Bounds = [[number, number], [number, number]];
+
+/** Leaflet-style `[[south, west], [north, east]]` bounds for a region. */
+export function regionToBounds(r: Region): Bounds {
+  const halfLat = r.latitudeDelta / 2;
+  const halfLng = r.longitudeDelta / 2;
+  return [
+    [r.latitude - halfLat, r.longitude - halfLng],
+    [r.latitude + halfLat, r.longitude + halfLng],
+  ];
+}

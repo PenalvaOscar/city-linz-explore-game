@@ -10,7 +10,7 @@ const strings = {
   points: 'pts',
   claim: 'Claim this spot',
   close: 'Close',
-  attribution: 'Data: Ars Electronica Festival 2026 · Stadt Linz (CC-BY) · Map:',
+  attribution: 'Data: Ars Electronica Festival 2026 · Stadt Linz (CC-BY) ·',
 } as const;
 
 export type StringKey = keyof typeof strings;

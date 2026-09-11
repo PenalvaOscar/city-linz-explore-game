@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { MAP_PROVIDER, SpotMap } from './src/components/SpotMap';
+import { MAP_ATTRIBUTION, SpotMap } from './src/components/SpotMap';
 import { SpotSheet } from './src/components/SpotSheet';
 import { spots } from './src/data/spots';
 import type { Spot } from './src/data/types';
@@ -21,7 +21,13 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <SpotMap spots={spots} holdings={holdings} showsUserLocation={granted} onSelect={setSelected} />
+      <SpotMap
+        spots={spots}
+        holdings={holdings}
+        showsUserLocation={granted}
+        position={position}
+        onSelect={setSelected}
+      />
       <View style={styles.header} pointerEvents="none">
         <Text style={styles.wordmark}>{t('appName')}</Text>
       </View>
@@ -35,7 +41,7 @@ export default function App() {
         />
       )}
       <View style={styles.attribution} pointerEvents="none">
-        <Text style={styles.attributionText}>{t('attribution')} {MAP_PROVIDER}</Text>
+        <Text style={styles.attributionText}>{t('attribution')} {MAP_ATTRIBUTION}</Text>
       </View>
       <StatusBar style="dark" />
     </View>
