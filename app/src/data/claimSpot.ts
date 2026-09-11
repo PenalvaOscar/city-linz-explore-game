@@ -9,7 +9,8 @@ export type ClaimPayload = {
   passed: boolean;
   distance_m: number;
   heading_delta: number | null;
-  gps_accuracy: number;
+  /** Null when the device reported no accuracy (only reachable with relaxed gates). */
+  gps_accuracy: number | null;
   dwell_seconds: number;
 };
 

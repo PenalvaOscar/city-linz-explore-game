@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { claimSpot } from '../data/claimSpot';
 import type { Spot } from '../data/types';
-import { initialClaimState, transition, type ClaimEvent, type ClaimState } from '../verify/claimMachine';
+import { initialClaimState, transition } from '../verify/claimMachine';
 import type { Thresholds } from '../verify/thresholds';
 import { useFlowPosition, type PositionSample } from './useFlowPosition';
 import { useHeading } from './useHeading';
@@ -29,6 +29,8 @@ export function useClaimFlow({ spot, player, thresholds, onClose, onSaved }: Arg
   useFlowPosition(onSample);
   useHeading(onHeading);
 
+  // Dwell advances on a wall-clock tick rather than per sample: iOS stops delivering position
+  // updates while the phone is still, which is exactly when a player is dwelling.
   const dwelling = state.step === 'dwelling';
   useEffect(() => {
     if (!dwelling) return;
@@ -47,7 +49,7 @@ export function useClaimFlow({ spot, player, thresholds, onClose, onSaved }: Arg
       passed: state.result.pass,
       distance_m: state.result.distanceM,
       heading_delta: state.result.headingDiff,
-      gps_accuracy: state.reading.accuracyM,
+      gps_accuracy: Number.isFinite(state.reading.accuracyM) ? state.reading.accuracyM : null,
       dwell_seconds: state.reading.dwellS,
     })
       .then((saved) => {
@@ -68,5 +70,5 @@ export function useClaimFlow({ spot, player, thresholds, onClose, onSaved }: Arg
     if (state.step === 'closed') onClose();
   }, [state.step, onClose]);
 
-  return { state, dispatch } as { state: ClaimState; dispatch: (e: ClaimEvent) => void };
+  return { state, dispatch };
 }

@@ -24,7 +24,8 @@ declare
 begin
   select h.player into v_previous_owner
   from holdings h
-  where h.spot_id = claim_spot.spot_id;
+  where h.spot_id = claim_spot.spot_id
+  for update;  -- two simultaneous claims on one spot serialise, so previous_owner is exact
 
   insert into claims (spot_id, player, points, passed, distance_m, heading_delta, gps_accuracy, dwell_seconds)
   values (

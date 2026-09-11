@@ -2,6 +2,7 @@ import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Spot } from '../../data/types';
 import { useClaimFlow } from '../../hooks/useClaimFlow';
+import type { ClaimStep } from '../../verify/claimMachine';
 import type { Thresholds } from '../../verify/thresholds';
 import { t } from '../../ui/strings';
 import { theme } from '../../ui/theme';
@@ -16,12 +17,15 @@ type Props = {
   player: string | null;
   setPlayer: (name: string) => Promise<void>;
   thresholds: Thresholds;
-  /** Back to map from any step: closes the flow only. */
+  /** Back to map from any step: closes the flow, keeps the sheet. */
   onClose: () => void;
   /** Done after a pass: closes the flow and the sheet. */
   onDone: () => void;
   onSaved: () => void;
 };
+
+/** Steps whose own view has no Back to map button, so the overlay draws one at the top. */
+const TOP_BACK_STEPS: ReadonlySet<ClaimStep> = new Set(['settling', 'approaching', 'dwelling', 'evaluating']);
 
 /** Full-screen overlay above the map that renders the claim state machine's current step. */
 export function ClaimFlow({ spot, player, setPlayer, thresholds, onClose, onDone, onSaved }: Props) {
@@ -81,7 +85,7 @@ export function ClaimFlow({ spot, player, setPlayer, thresholds, onClose, onDone
 
   return (
     <View style={styles.overlay}>
-      {state.step !== 'camera' && state.step !== 'name' ? (
+      {TOP_BACK_STEPS.has(state.step) ? (
         <Pressable onPress={abandon} style={styles.back} accessibilityRole="button" hitSlop={12}>
           <Text style={styles.backText}>← {t('backToMap')}</Text>
         </Pressable>

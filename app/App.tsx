@@ -67,7 +67,10 @@ export default function App() {
           player={player.name}
           setPlayer={player.setName}
           thresholds={thresholds}
-          onClose={() => setClaiming(null)}
+          onClose={() => {
+            setClaiming(null);
+            refresh(); // a claim abandoned while saving may still have landed
+          }}
           onDone={() => {
             setClaiming(null);
             setSelected(null);

@@ -25,7 +25,7 @@ export function NameStep({ onSubmit, onCancel }: Props) {
             onChangeText={setRaw}
             placeholder={t('namePlaceholder')}
             placeholderTextColor={theme.muted}
-            maxLength={PLAYER_NAME_MAX + 2}
+            maxLength={PLAYER_NAME_MAX}
             autoFocus
             autoCorrect={false}
             returnKeyType="done"
