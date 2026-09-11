@@ -41,11 +41,6 @@ The city and the festival publish data, not reasons to go anywhere. Everyone wal
 - Gems from festival calendar with a demo time override.
 - Teasers and unlock stories written into the data.
 
-### Stretch (only if day 2 is green by 11:00)
-
-- Web export deployed to Vercel for zero-install judges.
-- Android APK via EAS cloud build.
-
 ### Not in the hackathon
 
 - AI image comparison (ADR-0002).
@@ -55,6 +50,7 @@ The city and the festival publish data, not reasons to go anywhere. Everyone wal
 - German UI; the data schema is bilingual, the content is EN.
 - Anti-spoofing beyond the sensor gates.
 - The A0 Stadtplan rasters in `docs/map/`.
+- Web export / Vercel, EAS builds, store binaries: the hackathon runs entirely in Expo Go (ADR-0001).
 
 ## Data
 

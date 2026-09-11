@@ -31,8 +31,8 @@ Interfaces, frozen now:
 
 | Time | A — App | B — Data | C — Verify + pitch |
 |---|---|---|---|
-| 09:30–11:00 | Claim flow screen: distance → dwell → heading → camera → result, using `evaluateClaim` | Gems: script filters calendar slots at outdoor locations for 12–13 Sept → `gems.json`; pick 5 | Player identity (id + name, local storage); Supabase project + `claims` table |
-| **11:00 checkpoint** | Go/no-go on Vercel web export and EAS Android build. Default: no. | | |
+| 09:30–11:00 | Claim flow screen: distance → dwell → heading → camera → result, using `evaluateClaim` | Gems: script filters calendar slots at outdoor locations for 12–13 Sept → `gems.json`; pick 5 | Player identity (id + name, local storage); Supabase hosted project, `players` + `claims` tables, `current_owners` view, public `photos` bucket |
+| **11:00 checkpoint** | Scope check: is the claim flow writing to Supabase? If not, cut gems and leaderboard polish. | | |
 | 11:00–12:30 | Ownership on the map (coloured pins), steal/reclaim writes to Supabase | Teasers + stories into `spots.csv` (written in-session with Claude Code, no API) | Leaderboard screen; `DEMO_NOW` override for gems |
 | 12:30–13:30 | Go outside: claim 3 spots for real; fix what breaks | Recruit 3–5 strangers to claim one | Record 60 s backup video of a successful claim |
 | 13:30–14:00 | Freeze. Rehearse pitch once out loud. | | |
@@ -50,8 +50,8 @@ Interfaces, frozen now:
 7. Gems with time window + demo override
 8. Teasers and unlock stories
 9. Decay (client-computed, `DECAY_DAYS` constant)
-10. Stretch: web export + Vercel
-11. Stretch: EAS Android build
+
+After the hackathon: web export + Vercel, EAS Android build (ADR-0001).
 
 ## Spot schema
 
@@ -88,4 +88,5 @@ CONTEXT.md      glossary
 - Android EXIF often lacks heading → CSV column is the source of truth.
 - Venue Wi-Fi may block phone↔laptop → `npx expo start --tunnel`.
 - Indoor GPS won't settle → all spots outdoors; demo video as backup.
-- Google Maps on a standalone Android build needs a key; Expo Go doesn't. Only matters for the EAS stretch.
+- Google Maps on a standalone Android build needs a key; Expo Go doesn't. Only matters after the hackathon.
+- Supabase anon key ships in the app bundle with RLS off; acceptable for a demo, not beyond it.

@@ -16,5 +16,5 @@ The product must be a phone app, not a website, but the development Mac has no X
 ## Consequences
 
 - Map is `react-native-maps` (works in Expo Go without a key). MapLibre is the better long-term choice and should be revisited when a dev build exists; keep the map behind one `<SpotMap>` component so the swap is contained.
-- Web export (`expo export -p web`) to Vercel is possible from the same codebase but needs a `Map.web.tsx` (react-leaflet) and a compass shim; deferred, decided at the day-2 checkpoint.
-- An iOS binary is not achievable without a paid Apple Developer account; an Android APK via EAS cloud build is a stretch goal only.
+- **All in on Expo Go for the hackathon (decided 11 Sept 2026).** No web export, no Vercel, no EAS build. Judges see the app on team phones or install Expo Go and scan the QR. Native-only code paths; no `Map.web.tsx`, no compass shim.
+- After the hackathon: web export (`expo export -p web`) is possible from the same codebase with a `Map.web.tsx` (react-leaflet) and a compass shim. An iOS binary needs a paid Apple Developer account; an Android APK needs an EAS cloud build.

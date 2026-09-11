@@ -4,7 +4,15 @@ status: accepted
 
 # Static bundled data before any backend
 
-The day-1 deliverable is a map with spots and photos; it needs no shared state, so the app reads a bundled `spots.json` and bundled downscaled photos, and there is no backend. Shared state (ownership, leaderboard) arrives with the claim-flow feature and will use Supabase's hosted free tier, since a local Docker database cannot be reached by phones outside the laptop's network.
+The day-1 deliverable is a map with spots and photos; it needs no shared state, so the app reads a bundled `spots.json` and bundled downscaled photos, and there is no backend. Shared state (ownership, leaderboard) arrives with the claim-flow feature on day 2 and uses **Supabase hosted, free tier**, called directly from the app with the anon key: no server of our own, the team already knows it, and a local Docker database cannot be reached by phones outside the laptop's network.
+
+## Considered options
+
+- **Supabase local (Docker)**: same API, but phones on venue Wi-Fi may not reach the laptop and strangers' phones never will.
+- **Firebase / Convex / PocketBase**: comparable effort, no existing team knowledge, and Firebase's data model makes the ownership query (latest claim per spot) clumsier than one SQL view.
+- **No backend, local storage only**: ownership isn't shared, so the steal mechanic doesn't exist.
+
+Lock-in is small: the data is plain Postgres (`players`, `claims`, `spots` mirror) and exportable; only the `supabase-js` client calls would need rewriting.
 
 ## Consequences
 
