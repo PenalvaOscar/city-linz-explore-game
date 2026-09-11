@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { supabase } from './utils/supabase';
 
-type Holding = { gem_id: string; player: string; held_since: string };
+type Holding = { spot_id: string; player: string; points: number; held_since: string };
 
 export default function App() {
   const [holdings, setHoldings] = useState<Holding[]>([]);
@@ -33,8 +33,8 @@ export default function App() {
       <Text>Holdings</Text>
       <FlatList
         data={holdings}
-        keyExtractor={(item) => item.gem_id}
-        renderItem={({ item }) => <Text>{item.gem_id} — {item.player}</Text>}
+        keyExtractor={(item) => item.spot_id}
+        renderItem={({ item }) => <Text>{item.spot_id} — {item.player} ({item.points})</Text>}
       />
     </View>
   );

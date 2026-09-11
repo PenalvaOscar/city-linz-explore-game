@@ -11,7 +11,7 @@ drop table if exists holdings;
 -- ---------------------------------------------------------------
 create table claims (
   id            uuid primary key default gen_random_uuid(),
-  gem_id        text        not null,
+  spot_id       text        not null,   -- id in data/spots.json
   player        text        not null,
   points        int         not null default 0,
   passed        boolean     not null default true,
@@ -23,31 +23,35 @@ create table claims (
   created_at    timestamptz not null default now()
 );
 
-create index claims_gem_idx    on claims (gem_id);
+create index claims_spot_idx   on claims (spot_id);
 create index claims_player_idx on claims (player);
 create index claims_time_idx   on claims (created_at desc);
 
 -- ---------------------------------------------------------------
--- holdings: who owns what right now. One row per gem.
+-- holdings: who owns what right now. One row per spot.
 -- A new claim overwrites the row — that is the steal.
+-- points is copied from spots.json at claim time so the
+-- leaderboard can be computed here.
 -- ---------------------------------------------------------------
 create table holdings (
-  gem_id     text primary key,
+  spot_id    text primary key,
   player     text        not null,
+  points     int         not null default 0,
   held_since timestamptz not null default now()
 );
 
 -- ---------------------------------------------------------------
 -- leaderboard: a view, not a table. Never gets out of sync.
+-- Sum of currently held spots, not lifetime claims: a steal
+-- moves points from victim to thief.
 -- ---------------------------------------------------------------
 create view leaderboard as
 select
   player,
   sum(points)              as points,
-  count(*)                 as claims,
-  max(created_at)          as last_claim
-from claims
-where passed
+  count(*)                 as spots,
+  max(held_since)          as last_claim
+from holdings
 group by player
 order by points desc;
 
@@ -63,14 +67,25 @@ create policy claims_open   on claims   for all using (true) with check (true);
 create policy holdings_open on holdings for all using (true) with check (true);
 
 -- ---------------------------------------------------------------
--- Two demo rows so the leaderboard is not empty on first load.
--- Delete before the pitch.
+-- Photo storage: public bucket "photos", anonymous upload allowed.
 -- ---------------------------------------------------------------
-insert into claims (gem_id, player, points, distance_m, heading_delta, dwell_seconds)
-values
-  ('klosterhof', 'lena', 30, 22.4, 11.0, 21),
-  ('hofgasse',   'tobi', 18, 31.8, 24.5, 19);
+insert into storage.buckets (id, name, public)
+values ('photos', 'photos', true)
+on conflict (id) do update set public = true;
 
-insert into holdings (gem_id, player) values
-  ('klosterhof', 'lena'),
-  ('hofgasse',   'tobi');
+drop policy if exists photos_open on storage.objects;
+create policy photos_open on storage.objects
+  for all using (bucket_id = 'photos') with check (bucket_id = 'photos');
+
+-- ---------------------------------------------------------------
+-- Two demo rows (real spot ids) so the map and leaderboard are
+-- not empty on first load. Delete before the pitch.
+-- ---------------------------------------------------------------
+insert into claims (spot_id, player, points, distance_m, heading_delta, dwell_seconds)
+values
+  ('lentos',    'lena', 10, 22.4, 11.0, 21),
+  ('mariendom', 'tobi', 10, 31.8, 24.5, 19);
+
+insert into holdings (spot_id, player, points) values
+  ('lentos',    'lena', 10),
+  ('mariendom', 'tobi', 10);
