@@ -51,9 +51,14 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
       </View>
       <Text style={styles.meta}>{formatDistance(distance)} · {heading}</Text>
       <View style={styles.buttonRow}>
-        <View style={styles.claim} accessibilityRole="button" accessibilityState={{ disabled: true }}>
+        <Pressable
+          disabled
+          style={styles.claim}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: true }}
+        >
           <Text style={styles.claimText}>{t('claim')}</Text>
-        </View>
+        </Pressable>
         {story ? (
           <Pressable
             onPress={() => setExpanded((e) => !e)}
