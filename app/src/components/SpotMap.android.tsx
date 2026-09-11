@@ -6,11 +6,11 @@ import type { LatLng } from '../verify/geo';
 import { initialRegion, regionToBounds } from '../verify/region';
 import { NO_PLAYER, pinState } from '../verify/pinState';
 import { pinColor, theme } from '../ui/theme';
-import { buildLeafletPage, parseMapMessage, type MapPin } from './leafletPage';
+import { buildLeafletPage, parseMapMessage, setPinsScript, type MapPin } from './leafletPage';
 
 // Android fallback for Expo Go, where the embedded Google Maps key is rejected (issue #4):
-// Leaflet + OpenStreetMap in a WebView, no API key. iOS keeps react-native-maps in SpotMap.tsx.
-export const MAP_ATTRIBUTION = '© OpenStreetMap contributors';
+// Leaflet + CARTO Positron tiles in a WebView, no API key. iOS keeps react-native-maps in SpotMap.tsx.
+export const MAP_ATTRIBUTION = '© OpenStreetMap contributors · © CARTO';
 
 type Props = {
   spots: Spot[];
@@ -26,7 +26,14 @@ export function SpotMap({ spots, holdings, showsUserLocation, position, onSelect
   const [ready, setReady] = useState(false);
 
   const pins: MapPin[] = useMemo(
-    () => spots.map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, color: pinColor[pinState(s, holdings, NO_PLAYER)] })),
+    () =>
+      spots.map((s) => ({
+        id: s.id,
+        lat: s.lat,
+        lng: s.lng,
+        color: pinColor[pinState(s, holdings, NO_PLAYER)],
+        heading: s.heading,
+      })),
     [spots, holdings],
   );
   const player = showsUserLocation ? position : null;
@@ -37,7 +44,7 @@ export function SpotMap({ spots, holdings, showsUserLocation, position, onSelect
   );
 
   useEffect(() => {
-    if (ready) webview.current?.injectJavaScript(`window.setPins(${JSON.stringify(pins)}); true;`);
+    if (ready) webview.current?.injectJavaScript(setPinsScript(pins));
   }, [ready, pins]);
 
   useEffect(() => {

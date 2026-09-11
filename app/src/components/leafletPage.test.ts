@@ -1,8 +1,8 @@
-import { buildLeafletPage, parseMapMessage, type MapPin } from './leafletPage';
+import { buildLeafletPage, parseMapMessage, setPinsScript, type MapPin } from './leafletPage';
 
 const pins: MapPin[] = [
-  { id: 'lentos', lat: 48.30962, lng: 14.28445, color: '#9E9E9E' },
-  { id: 'ars', lat: 48.3005623, lng: 14.28674828, color: '#7B1FA2' },
+  { id: 'lentos', lat: 48.30962, lng: 14.28445, color: '#9E9E9E', heading: null },
+  { id: 'ars', lat: 48.3005623, lng: 14.28674828, color: '#7B1FA2', heading: 214 },
 ];
 const bounds: [[number, number], [number, number]] = [
   [48.29, 14.26],
@@ -21,8 +21,14 @@ describe('buildLeafletPage', () => {
   it('fits the initial bounds', () => {
     expect(html).toContain('[[48.29,14.26],[48.31,14.3]]');
   });
-  it('uses OpenStreetMap tiles without browser geolocation', () => {
-    expect(html).toContain('tile.openstreetmap.org');
+  it('gives only pins with a heading an arrow, next to their colour', () => {
+    expect(html).toContain('"color":"#7B1FA2","arrow":{"rotation":214}');
+    expect(html).toContain('"color":"#9E9E9E","arrow":null');
+    expect(html.match(/"arrow":\{/g)).toHaveLength(1);
+  });
+  it('uses CARTO Positron tiles, not OpenStreetMap standard, without browser geolocation', () => {
+    expect(html).toContain('basemaps.cartocdn.com/light_all/');
+    expect(html).not.toContain('tile.openstreetmap.org');
     expect(html).not.toContain('navigator.geolocation');
   });
   it('pins the Leaflet assets with subresource integrity', () => {
@@ -34,11 +40,21 @@ describe('buildLeafletPage', () => {
   });
   it('does not break out of the script tag when a pin id contains one', () => {
     const evil = buildLeafletPage({
-      pins: [{ id: '</script><script>alert(1)', lat: 0, lng: 0, color: '#000' }],
+      pins: [{ id: '</script><script>alert(1)', lat: 0, lng: 0, color: '#000', heading: null }],
       bounds,
       playerColor: '#000',
     });
     expect(evil).not.toContain('</script><script>alert(1)');
+  });
+});
+
+describe('setPinsScript', () => {
+  it('sends the same pin shape the page was built with', () => {
+    const script = setPinsScript(pins);
+    expect(script).toContain('window.setPins([');
+    expect(script).toContain('"color":"#7B1FA2","arrow":{"rotation":214}');
+    expect(script).toContain('"color":"#9E9E9E","arrow":null');
+    expect(script).not.toContain('"heading"');
   });
 });
 

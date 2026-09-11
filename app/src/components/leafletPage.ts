@@ -1,9 +1,13 @@
+import { headingGlyph, type HeadingGlyph } from '../verify/headingGlyph';
 import type { Bounds } from '../verify/region';
 
-// Leaflet + OpenStreetMap page for the Android map (issue #4). Colours arrive resolved from
-// pinState/pinColor; this file only draws what it is given.
+// Leaflet + CARTO Positron page for the Android map (issues #4, #7). Colours arrive resolved from
+// pinState/pinColor and the arrow from headingGlyph; the page script only draws what it is given.
 
-export type MapPin = { id: string; lat: number; lng: number; color: string };
+export type MapPin = { id: string; lat: number; lng: number; color: string; heading: number | null };
+
+/** What the page script receives per pin: the heading already reduced to its glyph. */
+type PagePin = { id: string; lat: number; lng: number; color: string; arrow: HeadingGlyph | null };
 
 export type MapMessage =
   | { type: 'ready' }
@@ -20,6 +24,13 @@ const LEAFLET_JS_SRI = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
 
 /** JSON that is safe to inline inside a `<script>` block. */
 const inlineJson = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
+
+const toPagePin = ({ heading, ...pin }: MapPin): PagePin => ({ ...pin, arrow: headingGlyph(heading) });
+
+/** The one call that hands pins to the page, used both inline at build time and later via injectJavaScript. */
+export function setPinsScript(pins: MapPin[]): string {
+  return `window.setPins(${inlineJson(pins.map(toPagePin))}); true;`;
+}
 
 export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): string {
   return `<!doctype html>
@@ -41,18 +52,22 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
   // A failed CDN load (venue Wi-Fi) would otherwise reproduce the blank map this page replaces, silently.
   window.onerror = function (message) { post({ type: 'error', message: String(message) }); };
   var map = L.map('map', { attributionControl: false, zoomControl: false });
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+  // URL template per CARTO's basemap-styles README; Leaflet fills {r} with "@2x" on retina screens.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19 }).addTo(map);
   map.fitBounds(${inlineJson(bounds)});
   map.on('click', function () { post({ type: 'deselect' }); });
 
-  var pinIcon = function (color) {
+  var pinIcon = function (color, arrow) {
+    var centre = arrow
+      ? '<path d="M13 7.5L18.5 18.5H7.5z" fill="#fff" transform="rotate(' + arrow.rotation + ' 13 13)"/>'
+      : '<circle cx="13" cy="13" r="4.5" fill="#fff"/>';
     return L.divIcon({
       className: '',
       iconSize: [26, 36],
       iconAnchor: [13, 36],
       html: '<svg class="pin" viewBox="0 0 26 36" xmlns="http://www.w3.org/2000/svg">' +
         '<path d="M13 0C5.8 0 0 5.8 0 13c0 9.5 13 23 13 23s13-13.5 13-23C26 5.8 20.2 0 13 0z" fill="' + color + '" stroke="#fff" stroke-width="1.5"/>' +
-        '<circle cx="13" cy="13" r="4.5" fill="#fff"/></svg>'
+        centre + '</svg>'
     });
   };
 
@@ -65,7 +80,7 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
         m.on('click', function () { post({ type: 'select', id: p.id }); });
         markers[p.id] = m;
       }
-      m.setIcon(pinIcon(p.color));
+      m.setIcon(pinIcon(p.color, p.arrow));
     });
   };
 
@@ -81,7 +96,7 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
     }
   };
 
-  window.setPins(${inlineJson(pins)});
+  ${setPinsScript(pins)}
   post({ type: 'ready' });
 </script>
 </body>
