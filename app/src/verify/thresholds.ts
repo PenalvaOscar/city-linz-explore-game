@@ -20,14 +20,14 @@ export const DEFAULT_THRESHOLDS: Thresholds = {
   accuracyMaxM: 60,
   headingPassDeg: 35,
   headingReviewDeg: 60,
-  dwellMinS: 10,
+  /** 0: the camera unlocks as soon as the player is in range. */
+  dwellMinS: 0,
 };
 
-/** Desk development (`EXPO_PUBLIC_RELAXED_GATES`): distance unlimited, no accuracy wait, 2 s dwell, heading still enforced. */
+/** Desk development (`EXPO_PUBLIC_RELAXED_GATES`): distance unlimited, no accuracy wait, heading still enforced. */
 export const RELAXED_THRESHOLDS: Thresholds = {
   ...DEFAULT_THRESHOLDS,
   distancePassM: Infinity,
   distanceReviewM: Infinity,
   accuracyMaxM: Infinity,
-  dwellMinS: 2,
 };

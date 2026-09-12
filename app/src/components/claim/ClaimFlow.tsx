@@ -7,7 +7,7 @@ import type { Thresholds } from '../../verify/thresholds';
 import { t } from '../../ui/strings';
 import { theme } from '../../ui/theme';
 import { ApproachStep } from './ApproachStep';
-import { PlaceholderCaptureStep } from './CaptureStep';
+import { CameraCaptureStep } from '../capture/CameraCaptureStep';
 import { NameStep } from './NameStep';
 import { ResultStep } from './ResultStep';
 
@@ -49,7 +49,7 @@ export function ClaimFlow({ spot, player, setPlayer, thresholds, onClose, onDone
       break;
     case 'camera':
       body = (
-        <PlaceholderCaptureStep
+        <CameraCaptureStep
           spot={spot}
           heading={state.heading}
           onCapture={(photoUri) => dispatch({ type: 'capture', photoUri })}

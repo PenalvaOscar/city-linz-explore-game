@@ -21,7 +21,9 @@ const at = (m: number, accuracyM = 10): ClaimEvent => ({ type: 'position', posit
 const tick: ClaimEvent = { type: 'tick' };
 const run = (state: ClaimState, events: ClaimEvent[]) => events.reduce(transition, state);
 
-const start = initialClaimState({ spot, thresholds: DEFAULT_THRESHOLDS, hasName: true });
+/** The default gates with a 10 s dwell, so the dwell rules below have something to exercise. */
+const DWELL_10 = { ...DEFAULT_THRESHOLDS, dwellMinS: 10 };
+const start = initialClaimState({ spot, thresholds: DWELL_10, hasName: true });
 const ticks = (n: number) => Array.from({ length: n }, () => tick);
 /** In range, dwelt for 10 s, facing the right way: ready to capture. */
 const atCamera = run(start, [at(5), { type: 'heading', heading: 30 }, ...ticks(10)]);
@@ -76,6 +78,12 @@ describe('claim machine: dwell', () => {
     expect(s.step).toBe('approaching');
     expect(s.dwellS).toBe(0);
     expect(run(s, [at(5), ...ticks(9)]).step).toBe('dwelling');
+  });
+  it('skips dwelling and unlocks the camera at once when no dwell is required', () => {
+    const noDwell = initialClaimState({ spot, thresholds: DEFAULT_THRESHOLDS, hasName: true });
+    const s = transition(noDwell, at(5));
+    expect(s.step).toBe('camera');
+    expect(s.dwellS).toBe(0);
   });
   it('resets when the accuracy degrades mid-dwell', () => {
     expect(run(start, [at(5), ...ticks(6), at(5, 90)]).dwellS).toBe(0);

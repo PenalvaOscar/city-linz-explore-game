@@ -71,9 +71,10 @@ describe('evaluateClaim: band edges', () => {
     expect(evaluateClaim(spot, { ...good, accuracyM: 60 }, T).gates.accuracy).toBe('pass');
     expect(evaluateClaim(spot, { ...good, accuracyM: 60.5 }, T).gates.accuracy).toBe('fail');
   });
-  it('dwell: 9 s fails, 10 s passes', () => {
-    expect(evaluateClaim(spot, { ...good, dwellS: 9 }, T).gates.dwell).toBe('fail');
-    expect(evaluateClaim(spot, { ...good, dwellS: 10 }, T).gates.dwell).toBe('pass');
+  it('dwell: 9 s fails, 10 s passes against a 10 s minimum', () => {
+    const T10 = { ...T, dwellMinS: 10 };
+    expect(evaluateClaim(spot, { ...good, dwellS: 9 }, T10).gates.dwell).toBe('fail');
+    expect(evaluateClaim(spot, { ...good, dwellS: 10 }, T10).gates.dwell).toBe('pass');
   });
 });
 
@@ -118,6 +119,6 @@ describe('evaluateClaim: pass is never blended', () => {
     expect(evaluateClaim(spot, { ...good, accuracyM: 90 }, T).pass).toBe(false);
   });
   it('is false when only dwell fails', () => {
-    expect(evaluateClaim(spot, { ...good, dwellS: 3 }, T).pass).toBe(false);
+    expect(evaluateClaim(spot, { ...good, dwellS: 3 }, { ...T, dwellMinS: 10 }).pass).toBe(false);
   });
 });

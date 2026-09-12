@@ -86,7 +86,7 @@ export function transition(state: ClaimState, event: ClaimEvent): ClaimState {
       if (!BEFORE_CAMERA.has(state.step)) return next;
       if (event.accuracyM > state.thresholds.accuracyMaxM) return { ...next, step: 'settling', dwellS: 0 };
       if (distance > state.thresholds.distancePassM) return { ...next, step: 'approaching', dwellS: 0 };
-      return { ...next, step: 'dwelling' };
+      return { ...next, step: next.dwellS >= state.thresholds.dwellMinS ? 'camera' : 'dwelling' };
     }
 
     case 'tick': {

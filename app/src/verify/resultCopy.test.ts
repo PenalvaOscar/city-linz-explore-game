@@ -52,7 +52,7 @@ describe('gateFailureLines', () => {
   });
   it('reports the dwell against the minimum', () => {
     const r: ClaimResult = { ...allPass, pass: false, gates: { ...allPass.gates, dwell: 'fail' } };
-    expect(gateFailureLines(r, { ...reading, dwellS: 6 }, DEFAULT_THRESHOLDS)).toEqual(['Stayed 6 s, stay at least 10 s']);
+    expect(gateFailureLines(r, { ...reading, dwellS: 6 }, { ...DEFAULT_THRESHOLDS, dwellMinS: 10 })).toEqual(['Stayed 6 s, stay at least 10 s']);
   });
   it('lists every non-passing gate, distance first', () => {
     const r: ClaimResult = {
