@@ -86,6 +86,9 @@ export function LeaderboardSheet({ holdings, holdingsAvailable, spots, player, o
           ) : null}
         </ScrollView>
       )}
+      <Pressable onPress={onClose} style={styles.back} accessibilityRole="button">
+        <Text style={styles.backText}>← {t('backToMap')}</Text>
+      </Pressable>
     </View>
   );
 }
@@ -122,7 +125,7 @@ const styles = StyleSheet.create({
   closeText: { color: theme.text, fontSize: 18, lineHeight: 20 },
   title: { fontSize: 20, fontWeight: '700', color: theme.text, paddingRight: 28 },
   season: { color: theme.muted, fontSize: 13, marginTop: -6 },
-  empty: { color: theme.muted, textAlign: 'center', paddingVertical: 24 },
+  empty: { flex: 1, color: theme.muted, textAlign: 'center', paddingVertical: 24 },
   list: { gap: 4 },
   row: {
     flexDirection: 'row',
@@ -144,4 +147,6 @@ const styles = StyleSheet.create({
   heldName: { flex: 1, color: theme.text },
   heldPoints: { color: theme.muted, fontSize: 13 },
   divider: { height: 1, backgroundColor: theme.border, marginVertical: 6 },
+  back: { alignSelf: 'stretch', paddingVertical: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: theme.border },
+  backText: { color: theme.primary, fontWeight: '700', fontSize: 16 },
 });
