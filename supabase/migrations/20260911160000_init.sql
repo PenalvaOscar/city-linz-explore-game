@@ -2,6 +2,8 @@
 -- Paste the whole file into Supabase → SQL Editor → Run.
 -- Safe to re-run: drops and recreates everything.
 
+create extension if not exists pgcrypto;
+
 drop view if exists leaderboard;
 drop table if exists spots;
 drop table if exists claims;
