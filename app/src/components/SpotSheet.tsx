@@ -31,6 +31,7 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, player,
   const distance = position ? distanceM(position, spot) : null;
   const heading = spot.heading === null ? t('headingUnknown') : `${Math.round(spot.heading)}°`;
   const story = spot.story.en;
+  const referencePhoto = spot.photo.startsWith('http') ? { uri: spot.photo } : photos[spot.photo];
 
   return (
     <View style={styles.card}>
@@ -38,7 +39,7 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, player,
         <Text style={styles.closeText}>×</Text>
       </Pressable>
       <View style={styles.headerRow}>
-        <Image source={photos[spot.photo]} style={styles.photo} resizeMode="cover" />
+        <Image source={referencePhoto} style={styles.photo} resizeMode="cover" />
         <View style={styles.titleColumn}>
           <Text style={styles.name}>{spot.name.en}</Text>
           {spot.teaser.en ? <Text style={styles.teaser}>{spot.teaser.en}</Text> : null}

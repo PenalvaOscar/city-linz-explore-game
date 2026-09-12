@@ -50,6 +50,7 @@ export function CameraCaptureStep({ spot, heading, thresholds, onCapture, onCanc
   const band = headingBand(turn === null ? null : Math.abs(turn), thresholds);
   const facing = !gated || band === 'green';
   const locked = !ready || busy || !facing;
+  const referencePhoto = spot.photo.startsWith('http') ? { uri: spot.photo } : photos[spot.photo];
 
   let indicator: string;
   if (!gated) indicator = t('captureTargetNone');
@@ -66,7 +67,7 @@ export function CameraCaptureStep({ spot, heading, thresholds, onCapture, onCanc
             <CameraView ref={camera} style={StyleSheet.absoluteFill} facing="back" onCameraReady={() => setReady(true)} />
             {ghost ? (
               <Image
-                source={photos[spot.photo]}
+                source={referencePhoto}
                 style={[StyleSheet.absoluteFill, styles.ghost]}
                 resizeMode="contain"
               />
