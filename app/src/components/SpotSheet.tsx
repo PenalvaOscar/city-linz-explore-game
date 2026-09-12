@@ -3,7 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Holding, Spot } from '../data/types';
 import { photos } from '../data/photos';
-import { formatDistance, ownershipLabel } from '../verify/format';
+import { formatDistance, ownershipLabel, windowLabel } from '../verify/format';
 import { distanceM, type LatLng } from '../verify/geo';
 import { pinState } from '../verify/pinState';
 import { t } from '../ui/strings';
@@ -16,18 +16,21 @@ type Props = {
   position: LatLng | null;
   /** The local player's display name; empty until one is stored. */
   player: string;
-  /** Claim is enabled only when this is set: the app has a position and the player identity has loaded. */
+  /** Claim is enabled only when this is set: the app has a position, the player identity has loaded, the season is on and a gem is inside its window. */
   onClaim: (() => void) | null;
   /** Location permission was refused, so Claim can never enable. */
   locationDenied: boolean;
+  /** The app clock's `now` at render, for a gem's upcoming state and window line. */
+  now: Date;
   onClose: () => void;
 };
 
 const STORY_PREVIEW_LINES = 3;
 
-export function SpotSheet({ spot, holdings, holdingsAvailable, position, player, onClaim, locationDenied, onClose }: Props) {
+export function SpotSheet({ spot, holdings, holdingsAvailable, position, player, onClaim, locationDenied, now, onClose }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const state = pinState(spot, holdings, player);
+  const state = pinState(spot, holdings, player, now);
+  const windowLine = windowLabel(spot, now);
   const owner = holdings.find((h) => h.spot_id === spot.id)?.player ?? null;
   const distance = position ? distanceM(position, spot) : null;
   const heading = spot.heading === null ? t('headingUnknown') : `${Math.round(spot.heading)}°`;
@@ -63,6 +66,12 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, player,
         <Text style={styles.meta}>{formatDistance(distance)}</Text>
         <Ionicons name="compass-outline" size={14} color={theme.primary} style={styles.metaIcon} />
         <Text style={styles.meta}>{heading}</Text>
+        {windowLine ? (
+          <>
+            <Ionicons name="time-outline" size={14} color={theme.primary} style={styles.metaIcon} />
+            <Text style={styles.meta}>{windowLine}</Text>
+          </>
+        ) : null}
       </View>
       <View style={styles.buttonRow}>
         <Pressable

@@ -22,12 +22,15 @@ export const theme = {
   backdrop: 'rgba(0,0,0,0.4)',
 } as const;
 
+/** The gem marker drawn on a gem pin over its ownership colour, on both maps. */
+export const gemMarkerColor = theme.accentPink;
+
 /** The only mapping from pin state to colour; components must not decide colours themselves. */
 export const pinColor: Record<PinState, string> = {
   free: '#9E9E9E',
   mine: '#F5C400',
   theirs: theme.primaryDark,
-  gem: theme.accentPink,
+  upcoming: '#C4C7D0',
 };
 
 /** The only mapping from heading band to colour; the capture step looks colours up here. */

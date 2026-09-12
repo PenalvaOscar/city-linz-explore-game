@@ -21,4 +21,4 @@ export type Spot = {
 
 export type Holding = { spot_id: string; player: string; points: number; held_since: string };
 
-export type PinState = 'free' | 'mine' | 'theirs' | 'gem';
+export type PinState = 'free' | 'mine' | 'theirs' | 'upcoming';

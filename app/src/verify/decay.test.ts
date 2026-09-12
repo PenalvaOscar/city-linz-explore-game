@@ -54,7 +54,7 @@ describe('applyDecay', () => {
   });
   it('makes pinState and the ownership label decay-aware once the array is filtered', () => {
     const live = applyDecay([holding('lentos', daysAgo(15))], now);
-    const state = pinState(lentos, live, 'tobi');
+    const state = pinState(lentos, live, 'tobi', now);
     expect(state).toBe('free');
     expect(ownershipLabel(state, live.find((h) => h.spot_id === 'lentos')?.player ?? null, true)).toBe('Free');
   });

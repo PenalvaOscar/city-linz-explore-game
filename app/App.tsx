@@ -62,8 +62,10 @@ export default function App() {
   // A closed gem leaves the map and the sheet; a held one still counts on the board, so the leaderboard keeps the full list for names.
   const visibleSpots = mapSpots.filter((spot) => windowState(spot, now) !== 'closed');
   const sheetSpot = selected !== null && windowState(selected, now) !== 'closed' ? selected : null;
-  // Once the season is over no claim handler is passed, the same path as a missing position, so a late claim cannot move the frozen board.
+  // Once the season is over, or while a gem is still upcoming, no claim handler is passed, the same path as a missing position,
+  // so a late or early claim cannot move the board.
   const canClaim = position !== null && player.loaded && !seasonStatus(now).over;
+  const canClaimSheet = canClaim && sheetSpot !== null && windowState(sheetSpot, now) === 'open';
 
   return (
     <View style={styles.container}>
@@ -73,6 +75,7 @@ export default function App() {
         player={me}
         showsUserLocation={granted}
         position={position}
+        now={now}
         onSelect={(spot) => { setLeaderboardOpen(false); setSelected(spot); }}
       />
       <View style={styles.header}>
@@ -125,8 +128,9 @@ export default function App() {
           holdingsAvailable={available}
           position={position}
           player={me}
-          onClaim={canClaim ? () => setClaiming(sheetSpot) : null}
+          onClaim={canClaimSheet ? () => setClaiming(sheetSpot) : null}
           locationDenied={denied}
+          now={now}
           onClose={() => setSelected(null)}
         />
       )}
