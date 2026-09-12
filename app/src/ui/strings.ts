@@ -22,6 +22,11 @@ const strings = {
   locationNeeded: 'Location needed to claim',
   moreInfo: 'More info',
   close: 'Close',
+  leaderboard: 'Leaderboard',
+  leaderboardUnavailable: 'Leaderboard unavailable',
+  leaderboardEmpty: 'No spots claimed yet, be the first',
+  spotCountOne: '1 spot',
+  spotCountMany: '{count} spots',
   attribution: 'Data: Ars Electronica Festival 2026 · Stadt Linz (CC-BY) ·',
   // Claim flow
   backToMap: 'Back to map',

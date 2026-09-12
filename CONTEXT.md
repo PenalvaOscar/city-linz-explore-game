@@ -56,4 +56,4 @@ The set of gates a claim must pass: GPS distance, GPS accuracy, compass heading,
 The minimum time a player must remain within range before the camera unlocks. Proves they stopped rather than passed by.
 
 **Leaderboard**:
-Ranking of players by the summed points of spots they currently own. Not lifetime points.
+Ranking of players by the summed points of spots they currently own. Not lifetime points. Ties break by number of spots (more first), then by the earliest of each player's most recent `held_since` (whoever reached their standing first wins). Ranks are 1-based with no gaps (`rankPlayers` in the verify module, fed the same decayed holdings the map uses).

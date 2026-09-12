@@ -5,6 +5,7 @@ import { ClaimFlow } from './src/components/claim/ClaimFlow';
 import { MAP_ATTRIBUTION, SpotMap } from './src/components/SpotMap';
 import { SpotSheet } from './src/components/SpotSheet';
 import { AddSpotSheet } from './src/components/AddSpotSheet';
+import { LeaderboardSheet } from './src/components/LeaderboardSheet';
 import { spots } from './src/data/spots';
 import { loadRemoteSpots } from './src/data/remoteSpots';
 import type { Spot } from './src/data/types';
@@ -23,6 +24,7 @@ export default function App() {
   const [selected, setSelected] = useState<Spot | null>(null);
   const [claiming, setClaiming] = useState<Spot | null>(null);
   const [addingSpot, setAddingSpot] = useState(false);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [mapSpots, setMapSpots] = useState(spots);
   const { holdings: rawHoldings, available, refresh } = useHoldings();
   // Decay is applied once here, at the time of each holdings read; everything below sees only live holdings.
@@ -45,8 +47,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (selected) refresh();
-  }, [selected, refresh]);
+    if (selected || leaderboardOpen) refresh();
+  }, [selected, leaderboardOpen, refresh]);
 
   const canClaim = position !== null && player.loaded;
 
@@ -58,7 +60,7 @@ export default function App() {
         player={me}
         showsUserLocation={granted}
         position={position}
-        onSelect={setSelected}
+        onSelect={(spot) => { setLeaderboardOpen(false); setSelected(spot); }}
       />
       <View style={styles.header} pointerEvents="none">
         <Text style={styles.wordmark}>{t('appName')}</Text>
@@ -67,6 +69,14 @@ export default function App() {
       <Pressable onPress={() => { setSelected(null); setAddingSpot(true); }} style={styles.addSpot}>
         <Text style={styles.addSpotText}>+</Text>
         <Text style={styles.addSpotLabel}>{t('addSpot')}</Text>
+      </Pressable>
+      <Pressable
+        onPress={() => { setSelected(null); setAddingSpot(false); setLeaderboardOpen(true); }}
+        style={styles.trophy}
+        accessibilityRole="button"
+        accessibilityLabel={t('leaderboard')}
+      >
+        <Text style={styles.trophyText}>🏆</Text>
       </Pressable>
       {addingSpot && (
         <AddSpotSheet
@@ -89,6 +99,15 @@ export default function App() {
           onClaim={canClaim ? () => setClaiming(selected) : null}
           locationDenied={denied}
           onClose={() => setSelected(null)}
+        />
+      )}
+      {leaderboardOpen && (
+        <LeaderboardSheet
+          holdings={holdings}
+          holdingsAvailable={available}
+          spots={mapSpots}
+          player={me}
+          onClose={() => setLeaderboardOpen(false)}
         />
       )}
       <View style={styles.attribution} pointerEvents="none">
@@ -148,6 +167,19 @@ const styles = StyleSheet.create({
   },
   addSpotText: { color: theme.white, fontSize: 22, lineHeight: 22, fontWeight: '700' },
   addSpotLabel: { color: theme.white, fontWeight: '700' },
+  trophy: {
+    position: 'absolute',
+    top: 190,
+    right: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+  },
+  trophyText: { fontSize: 20 },
   attribution: {
     position: 'absolute',
     bottom: 24,
