@@ -15,16 +15,18 @@ type Props = {
   spots: Spot[];
   /** The local player's display name; empty until one is stored. */
   player: string;
+  /** The app clock's `now` at render; read once per open for the season line. */
+  now: Date;
   onClose: () => void;
 };
 
-export function LeaderboardSheet({ holdings, holdingsAvailable, spots, player, onClose }: Props) {
+export function LeaderboardSheet({ holdings, holdingsAvailable, spots, player, now, onClose }: Props) {
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
   const rows = useMemo(() => rankPlayers(holdings), [holdings]);
   const { top, own } = boardRows(rows, player);
   const spotNames = useMemo(() => new Map(spots.map((s) => [s.id, s.name.en])), [spots]);
   // Read once per open; the sheet is short-lived, so a ticking clock would only add churn.
-  const [season] = useState(() => seasonStatus(new Date()));
+  const [season] = useState(() => seasonStatus(now));
 
   const renderRow = (row: LeaderboardRow) => {
     const mine = player !== '' && row.player === player;

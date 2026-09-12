@@ -65,3 +65,7 @@ _Avoid_: round, event period
 **Prize**:
 What the top ranks win at season end. Labels for ranks 1 to 3 live only in the season content module and show next to the rank on the leaderboard.
 _Avoid_: reward, award
+
+**Demo clock**:
+An instant the app starts at instead of the wall clock (`EXPO_PUBLIC_DEMO_NOW`), running on from there by real elapsed time. Created once at the app root (`createClock` in the verify module) and the only source of `now` for decay, the season and gem windows; no other module reads the wall clock as a time source.
+_Avoid_: fake time, frozen time, time travel
