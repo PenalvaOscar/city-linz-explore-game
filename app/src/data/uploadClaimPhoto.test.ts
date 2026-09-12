@@ -16,7 +16,7 @@ const bytes = new Uint8Array([0xff, 0xd8, 0xff]).buffer;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  globalThis.fetch = jest.fn(async () => ({ arrayBuffer: async () => bytes })) as unknown as typeof fetch;
+  globalThis.fetch = jest.fn(async () => ({ ok: true, arrayBuffer: async () => bytes })) as unknown as typeof fetch;
   mockUpload.mockResolvedValue({ error: null });
   mockGetPublicUrl.mockReturnValue({ data: { publicUrl: 'https://x.supabase.co/storage/v1/object/public/photos/c1.jpg' } });
   mockEq.mockResolvedValue({ error: null });
