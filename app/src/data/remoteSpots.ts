@@ -12,11 +12,18 @@ type RemoteSpot = {
   photo: string;
 };
 
+function publicPhotoUrl(photo: string): string {
+  if (photo.startsWith('http://') || photo.startsWith('https://')) return photo;
+  return supabase.storage.from('photos').getPublicUrl(photo.replace(/^\/+/, '')).data.publicUrl;
+}
+
 export async function loadRemoteSpots(): Promise<Spot[]> {
   const { data, error } = await supabase.from('spots').select('*');
   if (error) throw error;
   return (data as RemoteSpot[]).map((row) => ({
     ...row,
+    kind: 'gem',
+    photo: publicPhotoUrl(row.photo),
     name: { en: row.name },
     teaser: { en: '' },
     story: { en: '' },

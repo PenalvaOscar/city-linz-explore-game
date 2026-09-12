@@ -65,7 +65,9 @@ export function useClaimFlow({ spot, holdings, player, thresholds, onClose, onSa
         // Photo proof for every saved attempt, passed or not, rides behind the result: a failed
         // upload is logged and the claim stands.
         if (state.photoUri) {
-          uploadClaimPhoto(saved.claimId, state.photoUri).catch((e) => console.warn('photo upload failed', e));
+          uploadClaimPhoto(saved.claimId, state.photoUri).catch((e) => {
+            console.warn('photo upload failed', e instanceof Error ? e.message : e);
+          });
         }
       })
       .catch(() => {

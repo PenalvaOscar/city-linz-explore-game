@@ -7,7 +7,9 @@ const BUCKET = 'photos';
  * `claims.photo_url` at it. Rejects on any failure; the caller logs and leaves the claim as it is.
  */
 export async function uploadClaimPhoto(claimId: string, uri: string): Promise<void> {
-  const bytes = await fetch(uri).then((res) => res.arrayBuffer());
+  const response = await fetch(uri);
+  if (!response.ok) throw new Error(`Could not read captured claim photo (${response.status})`);
+  const bytes = await response.arrayBuffer();
   const path = `${claimId}.jpg`;
   const bucket = supabase.storage.from(BUCKET);
 
