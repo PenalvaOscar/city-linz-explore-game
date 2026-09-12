@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { ClaimFlow } from './src/components/claim/ClaimFlow';
 import { MAP_ATTRIBUTION, SpotMap } from './src/components/SpotMap';
 import { SpotSheet } from './src/components/SpotSheet';
 import { AddSpotSheet } from './src/components/AddSpotSheet';
+import { LeaderboardSheet } from './src/components/LeaderboardSheet';
 import { spots } from './src/data/spots';
 import { loadRemoteSpots } from './src/data/remoteSpots';
+import { seasonStatus } from './src/data/season';
 import type { Spot } from './src/data/types';
 import { useHoldings } from './src/hooks/useHoldings';
 import { usePlayer } from './src/hooks/usePlayer';
 import { usePosition } from './src/hooks/usePosition';
+import { applyDecay } from './src/verify/decay';
 import { DEFAULT_THRESHOLDS, RELAXED_THRESHOLDS } from './src/verify/thresholds';
 import { t } from './src/ui/strings';
 import { theme } from './src/ui/theme';
@@ -22,8 +25,11 @@ export default function App() {
   const [selected, setSelected] = useState<Spot | null>(null);
   const [claiming, setClaiming] = useState<Spot | null>(null);
   const [addingSpot, setAddingSpot] = useState(false);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [mapSpots, setMapSpots] = useState(spots);
-  const { holdings, available, refresh } = useHoldings();
+  const { holdings: rawHoldings, available, refresh } = useHoldings();
+  // Decay is applied once here, at the time of each holdings read; everything below sees only live holdings.
+  const holdings = useMemo(() => applyDecay(rawHoldings, new Date()), [rawHoldings]);
   const { granted, denied, position } = usePosition();
   const player = usePlayer();
   const me = player.name ?? '';
@@ -42,10 +48,11 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (selected) refresh();
-  }, [selected, refresh]);
+    if (selected || leaderboardOpen) refresh();
+  }, [selected, leaderboardOpen, refresh]);
 
-  const canClaim = position !== null && player.loaded;
+  // Once the season is over no claim handler is passed, the same path as a missing position, so a late claim cannot move the frozen board.
+  const canClaim = position !== null && player.loaded && !seasonStatus(new Date()).over;
 
   return (
     <View style={styles.container}>
@@ -55,7 +62,7 @@ export default function App() {
         player={me}
         showsUserLocation={granted}
         position={position}
-        onSelect={setSelected}
+        onSelect={(spot) => { setLeaderboardOpen(false); setSelected(spot); }}
       />
       <View style={styles.header} pointerEvents="none">
         <Text style={styles.wordmark}>{t('appName')}</Text>
@@ -64,6 +71,14 @@ export default function App() {
       <Pressable onPress={() => { setSelected(null); setAddingSpot(true); }} style={styles.addSpot}>
         <Text style={styles.addSpotText}>+</Text>
         <Text style={styles.addSpotLabel}>{t('addSpot')}</Text>
+      </Pressable>
+      <Pressable
+        onPress={() => { setSelected(null); setAddingSpot(false); setLeaderboardOpen(true); }}
+        style={styles.trophy}
+        accessibilityRole="button"
+        accessibilityLabel={t('leaderboard')}
+      >
+        <Text style={styles.trophyText}>🏆</Text>
       </Pressable>
       {addingSpot && (
         <AddSpotSheet
@@ -88,6 +103,15 @@ export default function App() {
           onClose={() => setSelected(null)}
         />
       )}
+      {leaderboardOpen && (
+        <LeaderboardSheet
+          holdings={holdings}
+          holdingsAvailable={available}
+          spots={mapSpots}
+          player={me}
+          onClose={() => setLeaderboardOpen(false)}
+        />
+      )}
       <View style={styles.attribution} pointerEvents="none">
         <Text style={styles.attributionText}>{t('attribution')} {MAP_ATTRIBUTION}</Text>
       </View>
@@ -95,6 +119,7 @@ export default function App() {
         <ClaimFlow
           key={`claim-${claiming.id}`}
           spot={claiming}
+          holdings={holdings}
           player={player.name}
           setPlayer={player.setName}
           thresholds={thresholds}
@@ -144,6 +169,19 @@ const styles = StyleSheet.create({
   },
   addSpotText: { color: theme.white, fontSize: 22, lineHeight: 22, fontWeight: '700' },
   addSpotLabel: { color: theme.white, fontWeight: '700' },
+  trophy: {
+    position: 'absolute',
+    top: 190,
+    right: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+  },
+  trophyText: { fontSize: 20 },
   attribution: {
     position: 'absolute',
     bottom: 24,

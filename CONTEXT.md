@@ -46,7 +46,7 @@ A successful claim by the current owner on their own spot. Resets the decay time
 The player whose claim on a spot is the most recent one still in force.
 
 **Decay**:
-Loss of ownership when the owner has not reclaimed for the decay period (14 days). A decayed spot is free.
+Loss of ownership when the owner has not reclaimed for the decay period (14 days). A decayed spot is free. In this version decay is applied in the app from the holding's `held_since` (`applyDecay` in the verify module, once at the app root); the server row stays until the next passing claim overwrites it.
 _Avoid_: grip, expiry
 
 **Verification**:
@@ -56,4 +56,12 @@ The set of gates a claim must pass: GPS distance, GPS accuracy, compass heading,
 The minimum time a player must remain within range before the camera unlocks. Proves they stopped rather than passed by.
 
 **Leaderboard**:
-Ranking of players by the summed points of spots they currently own. Not lifetime points.
+Ranking of players by the summed points of spots they currently own. Not lifetime points. Ties break by number of spots (more first), then by the earliest of each player's most recent `held_since` (whoever reached their standing first wins). Ranks are 1-based with no gaps (`rankPlayers` in the verify module, fed the same decayed holdings the map uses).
+
+**Season**:
+The period during which claims count towards the leaderboard. It ends at a single configured instant (`SEASON_END` in the season content module); from that instant the board is frozen and no claim handler is offered.
+_Avoid_: round, event period
+
+**Prize**:
+What the top ranks win at season end. Labels for ranks 1 to 3 live only in the season content module and show next to the rank on the leaderboard.
+_Avoid_: reward, award

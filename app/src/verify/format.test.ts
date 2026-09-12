@@ -1,4 +1,4 @@
-import { formatDistance, ownershipLabel } from './format';
+import { formatDistance, formatRemaining, ownershipLabel } from './format';
 
 describe('formatDistance', () => {
   it('is a dash without a distance', () => {
@@ -33,5 +33,21 @@ describe('ownershipLabel', () => {
   });
   it('reads Gem for a gem', () => {
     expect(ownershipLabel('gem', null, true)).toBe('Gem');
+  });
+});
+
+describe('formatRemaining', () => {
+  const h = 60 * 60 * 1000;
+  it('shows days and hours from one day on', () => {
+    expect(formatRemaining(14 * 24 * h + 3 * h + 20 * 60 * 1000)).toBe('14 d 3 h');
+    expect(formatRemaining(24 * h)).toBe('1 d 0 h');
+  });
+  it('shows hours and minutes below a day', () => {
+    expect(formatRemaining(5 * h + 7 * 60 * 1000 + 59 * 1000)).toBe('5 h 7 min');
+    expect(formatRemaining(23 * h + 59 * 60 * 1000 + 59 * 1000)).toBe('23 h 59 min');
+  });
+  it('shows minutes only below an hour, down to zero', () => {
+    expect(formatRemaining(12 * 60 * 1000)).toBe('12 min');
+    expect(formatRemaining(0)).toBe('0 min');
   });
 });

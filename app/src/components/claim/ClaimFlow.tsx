@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Spot } from '../../data/types';
+import type { Holding, Spot } from '../../data/types';
 import { useClaimFlow } from '../../hooks/useClaimFlow';
 import type { ClaimStep } from '../../verify/claimMachine';
 import type { Thresholds } from '../../verify/thresholds';
@@ -13,6 +13,8 @@ import { ResultStep } from './ResultStep';
 
 type Props = {
   spot: Spot;
+  /** The holdings still in force (decay already applied). */
+  holdings: Holding[];
   /** Stored display name, null when none exists yet. */
   player: string | null;
   setPlayer: (name: string) => Promise<void>;
@@ -28,8 +30,8 @@ type Props = {
 const TOP_BACK_STEPS: ReadonlySet<ClaimStep> = new Set(['settling', 'approaching', 'dwelling', 'evaluating']);
 
 /** Full-screen overlay above the map that renders the claim state machine's current step. */
-export function ClaimFlow({ spot, player, setPlayer, thresholds, onClose, onDone, onSaved }: Props) {
-  const { state, dispatch } = useClaimFlow({ spot, player, thresholds, onClose, onSaved });
+export function ClaimFlow({ spot, holdings, player, setPlayer, thresholds, onClose, onDone, onSaved }: Props) {
+  const { state, dispatch } = useClaimFlow({ spot, holdings, player, thresholds, onClose, onSaved });
   const abandon = () => dispatch({ type: 'abandon' });
 
   let body: React.ReactNode;
