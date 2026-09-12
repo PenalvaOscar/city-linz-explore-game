@@ -1,0 +1,117 @@
+[
+  {
+    "id": "gem-main-square-linz-0909",
+    "name": {
+      "en": "Main Square Linz · Wed 9"
+    },
+    "teaser": {
+      "en": "Wed 12:00 to 20:00"
+    },
+    "story": {
+      "en": "Negotiating Democracy at the OpenDemocracyLab\n\nOur democracies and constitutions rest on foundations that were originally laid in a very different world. In this participatory workshop, IG Demokratie invites participants to explore the roots of the current crisis of democracy."
+    },
+    "lat": 48.30601368,
+    "lng": 14.28628506,
+    "heading": null,
+    "kind": "gem",
+    "points": 50,
+    "photo": "pestsaeule.jpg",
+    "window": {
+      "start": "2026-09-09T12:00:00+02:00",
+      "end": "2026-09-09T20:00:00+02:00",
+      "locationId": "34238ddb450c81ac8432eab6e4831002"
+    }
+  },
+  {
+    "id": "gem-main-square-linz-0910",
+    "name": {
+      "en": "Main Square Linz · Thu 10"
+    },
+    "teaser": {
+      "en": "Thu 12:00 to 20:00"
+    },
+    "story": {
+      "en": "Negotiating Democracy at the OpenDemocracyLab\n\nOur democracies and constitutions rest on foundations that were originally laid in a very different world. In this participatory workshop, IG Demokratie invites participants to explore the roots of the current crisis of democracy."
+    },
+    "lat": 48.30601368,
+    "lng": 14.28628506,
+    "heading": null,
+    "kind": "gem",
+    "points": 50,
+    "photo": "pestsaeule.jpg",
+    "window": {
+      "start": "2026-09-10T12:00:00+02:00",
+      "end": "2026-09-10T20:00:00+02:00",
+      "locationId": "34238ddb450c81ac8432eab6e4831002"
+    }
+  },
+  {
+    "id": "gem-main-square-linz-0911",
+    "name": {
+      "en": "Main Square Linz · Fri 11"
+    },
+    "teaser": {
+      "en": "Fri 12:00 to 20:00"
+    },
+    "story": {
+      "en": "The Elon Musk Antagonist\n\nElon Musk wielded a chainsaw against public services, social and environmental rights. Attac flips it: Within the participative performances people can oppose the power of billionaires, tech oligarchs and the ultra-rich. Come and watch how power gets dismantled and alternatives built."
+    },
+    "lat": 48.30601368,
+    "lng": 14.28628506,
+    "heading": null,
+    "kind": "gem",
+    "points": 50,
+    "photo": "pestsaeule.jpg",
+    "window": {
+      "start": "2026-09-11T12:00:00+02:00",
+      "end": "2026-09-11T20:00:00+02:00",
+      "locationId": "34238ddb450c81ac8432eab6e4831002"
+    }
+  },
+  {
+    "id": "gem-main-square-linz-0912",
+    "name": {
+      "en": "Main Square Linz · Sat 12"
+    },
+    "teaser": {
+      "en": "Sat 12:00 to 20:00"
+    },
+    "story": {
+      "en": "Seeds of the Unthinkable\n\nResearchers from INVI and University of Copenhagen show you how to use AI to imagine new futures for our food and health systems, from what lives in our soils today to what will land on our plate in 2050. Decode AI-generated images, make your own visions come to life and help expand the collective imagination!"
+    },
+    "lat": 48.30601368,
+    "lng": 14.28628506,
+    "heading": null,
+    "kind": "gem",
+    "points": 50,
+    "photo": "pestsaeule.jpg",
+    "window": {
+      "start": "2026-09-12T12:00:00+02:00",
+      "end": "2026-09-12T20:00:00+02:00",
+      "locationId": "34238ddb450c81ac8432eab6e4831002"
+    }
+  },
+  {
+    "id": "gem-main-square-linz-0913",
+    "name": {
+      "en": "Main Square Linz · Sun 13"
+    },
+    "teaser": {
+      "en": "Sun 12:00 to 18:00"
+    },
+    "story": {
+      "en": "Negotiating Democracy at the OpenDemocracyLab\n\nOur democracies and constitutions rest on foundations that were originally laid in a very different world. In this participatory workshop, IG Demokratie invites participants to explore the roots of the current crisis of democracy."
+    },
+    "lat": 48.30601368,
+    "lng": 14.28628506,
+    "heading": null,
+    "kind": "gem",
+    "points": 50,
+    "photo": "pestsaeule.jpg",
+    "window": {
+      "start": "2026-09-13T12:00:00+02:00",
+      "end": "2026-09-13T18:00:00+02:00",
+      "locationId": "34238ddb450c81ac8432eab6e4831002"
+    }
+  }
+]

@@ -15,8 +15,10 @@ type RemoteSpot = {
 export async function loadRemoteSpots(): Promise<Spot[]> {
   const { data, error } = await supabase.from('spots').select('*');
   if (error) throw error;
+  // Remote rows have no window, so they are always Linz spots whatever their stored kind; only generated gems carry a window.
   return (data as RemoteSpot[]).map((row) => ({
     ...row,
+    kind: 'linz' as const,
     name: { en: row.name },
     teaser: { en: '' },
     story: { en: '' },
@@ -59,6 +61,7 @@ export async function saveNewSpot(input: {
 
   return {
     ...row,
+    kind: 'linz',
     name: { en: row.name },
     teaser: { en: '' },
     story: { en: '' },

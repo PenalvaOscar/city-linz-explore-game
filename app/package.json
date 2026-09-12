@@ -31,7 +31,8 @@
     "web": "expo start --web",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "build:photos": "node scripts/build-photo-index.js"
+    "build:photos": "node scripts/build-photo-index.js",
+    "build:gems": "node scripts/build-gems.js"
   },
   "private": true,
   "jest": {
