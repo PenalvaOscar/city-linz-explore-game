@@ -52,15 +52,16 @@ export function SpotMap({ spots, holdings, player, showsUserLocation, now, onSel
 }
 
 // Same 26x36 teardrop as the Android page's SVG, built from views so no SVG dependency is needed:
-// a white outline triangle, the circular head, the coloured tail over the head's border, then the
+// an outline triangle, the circular head, the coloured tail over the head's border, then the
 // white dot or, when the heading is known, the white arrow on top, and on a gem the diamond marker
-// over the head's top-right rim.
+// over the head's top-right rim. The outline is white, or the gem colour on a gem pin.
 function Pin({ color, heading, gem }: { color: string; heading: number | null; gem: boolean }) {
   const glyph = headingGlyph(heading);
+  const outline = gem ? gemMarkerColor : theme.white;
   return (
     <View style={styles.pin}>
-      <View style={styles.tailOutline} />
-      <View style={[styles.head, { backgroundColor: color }]} />
+      <View style={[styles.tailOutline, { borderTopColor: outline }]} />
+      <View style={[styles.head, { backgroundColor: color, borderColor: outline }]} />
       <View style={[styles.tail, { borderTopColor: color }]} />
       <View style={[styles.glyph, glyph && { transform: [{ rotate: `${glyph.rotation}deg` }] }]}>
         {glyph ? <View style={styles.arrow} /> : <View style={styles.dot} />}
@@ -83,10 +84,9 @@ const styles = StyleSheet.create({
     borderLeftWidth: 10.7,
     borderRightWidth: 10.7,
     borderTopWidth: 15.7,
-    borderTopColor: theme.white,
   },
   tail: { ...triangle, top: 19.5, left: 3.5, borderLeftWidth: 9.5, borderRightWidth: 9.5, borderTopWidth: 13.8 },
-  head: { width: 26, height: 26, borderRadius: 13, borderWidth: 1.5, borderColor: theme.white },
+  head: { width: 26, height: 26, borderRadius: 13, borderWidth: 1.5 },
   glyph: { position: 'absolute', top: 0, left: 0, width: 26, height: 26, alignItems: 'center', justifyContent: 'center' },
   dot: { width: 9, height: 9, borderRadius: 4.5, backgroundColor: theme.white },
   // A 7x7 square turned 45° reads as the 10-wide diamond centred at (20, 6) on the Android page.

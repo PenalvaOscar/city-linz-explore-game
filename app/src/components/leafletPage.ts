@@ -57,9 +57,11 @@ export function buildLeafletPage({ pins, bounds, playerColor, gemColor }: PageIn
   map.fitBounds(${inlineJson(bounds)});
   map.on('click', function () { post({ type: 'deselect' }); });
 
-  // A gem pin carries a small diamond over the head's top-right rim, whatever its ownership colour.
+  // A gem pin carries a small diamond over the head's top-right rim and swaps the white outline for
+  // the gem colour, whatever its ownership colour, so it reads as a gem from a distance.
   var gemMarker = '<path d="M20 1L25 6L20 11L15 6z" fill="' + ${inlineJson(gemColor)} + '" stroke="#fff" stroke-width="1.5"/>';
   var pinIcon = function (color, arrow, gem) {
+    var outline = gem ? ${inlineJson(gemColor)} : '#fff';
     var centre = arrow
       ? '<path d="M13 7.5L18.5 18.5H7.5z" fill="#fff" transform="rotate(' + arrow.rotation + ' 13 13)"/>'
       : '<circle cx="13" cy="13" r="4.5" fill="#fff"/>';
@@ -68,7 +70,7 @@ export function buildLeafletPage({ pins, bounds, playerColor, gemColor }: PageIn
       iconSize: [26, 36],
       iconAnchor: [13, 36],
       html: '<svg class="pin" viewBox="0 0 26 36" xmlns="http://www.w3.org/2000/svg">' +
-        '<path d="M13 0C5.8 0 0 5.8 0 13c0 9.5 13 23 13 23s13-13.5 13-23C26 5.8 20.2 0 13 0z" fill="' + color + '" stroke="#fff" stroke-width="1.5"/>' +
+        '<path d="M13 0C5.8 0 0 5.8 0 13c0 9.5 13 23 13 23s13-13.5 13-23C26 5.8 20.2 0 13 0z" fill="' + color + '" stroke="' + outline + '" stroke-width="1.5"/>' +
         centre + (gem ? gemMarker : '') + '</svg>'
     });
   };

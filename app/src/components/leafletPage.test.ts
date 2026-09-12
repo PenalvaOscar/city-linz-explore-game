@@ -31,6 +31,9 @@ describe('buildLeafletPage', () => {
     expect(html).toContain('"color":"#9E9E9E","arrow":null,"gem":false');
     expect(html).toContain('"#E5007D"');
   });
+  it('outlines gem pins in the gem colour and the rest in white', () => {
+    expect(html).toContain(`var outline = gem ? "#E5007D" : '#fff'`);
+  });
   it('uses CARTO Voyager tiles, not OpenStreetMap standard, without browser geolocation', () => {
     expect(html).toContain('basemaps.cartocdn.com/rastertiles/voyager/');
     expect(html).not.toContain('tile.openstreetmap.org');

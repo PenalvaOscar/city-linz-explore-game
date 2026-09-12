@@ -22,15 +22,19 @@ export const theme = {
   backdrop: 'rgba(0,0,0,0.4)',
 } as const;
 
-/** The gem marker drawn on a gem pin over its ownership colour, on both maps. */
+/** The gem marker and outline drawn on a gem pin over its ownership colour, on both maps (issue #21). */
 export const gemMarkerColor = theme.accentPink;
 
-/** The only mapping from pin state to colour; components must not decide colours themselves. */
+/**
+ * The only mapping from pin state to colour; components must not decide colours themselves.
+ * Checked against the mockup in issue #21: yellow for mine, the linz.at blue for theirs, a cool grey
+ * for free and a paler grey for upcoming, all light enough to keep the white glyph readable.
+ */
 export const pinColor: Record<PinState, string> = {
-  free: '#9E9E9E',
-  mine: '#F5C400',
-  theirs: theme.primaryDark,
-  upcoming: '#C4C7D0',
+  free: '#8E93A3',
+  mine: '#FFD21F',
+  theirs: theme.primary,
+  upcoming: '#D3D6DF',
 };
 
 /** The only mapping from heading band to colour; the capture step looks colours up here. */
