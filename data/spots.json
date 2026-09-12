@@ -114,8 +114,8 @@
     "lat": 48.3005078,
     "lng": 14.2868881,
     "heading": 230,
-    "kind": "gem",
-    "points": 30,
+    "kind": "linz",
+    "points": 10,
     "photo": "new-cathedral.jpg",
     "window": null
   },
@@ -414,8 +414,8 @@
     "lat": 48.3124394,
     "lng": 14.2993076,
     "heading": 52,
-    "kind": "gem",
-    "points": 30,
+    "kind": "linz",
+    "points": 10,
     "photo": "grand-garage.jpg",
     "window": null
   },
@@ -434,8 +434,8 @@
     "lat": 48.3124648,
     "lng": 14.2993062,
     "heading": 23,
-    "kind": "gem",
-    "points": 30,
+    "kind": "linz",
+    "points": 10,
     "photo": "the-robot.jpg",
     "window": null
   },
@@ -454,8 +454,8 @@
     "lat": 48.3120697,
     "lng": 14.2994024,
     "heading": 125,
-    "kind": "gem",
-    "points": 30,
+    "kind": "linz",
+    "points": 10,
     "photo": "casablanca.jpg",
     "window": null
   },
@@ -474,8 +474,8 @@
     "lat": 48.3124023,
     "lng": 14.2989859,
     "heading": 325,
-    "kind": "gem",
-    "points": 30,
+    "kind": "linz",
+    "points": 10,
     "photo": "uni-box.jpg",
     "window": null
   },
@@ -494,8 +494,8 @@
     "lat": 48.3124614,
     "lng": 14.2991753,
     "heading": 230,
-    "kind": "gem",
-    "points": 30,
+    "kind": "linz",
+    "points": 10,
     "photo": "quadrill.jpg",
     "window": null
   }

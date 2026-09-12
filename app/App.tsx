@@ -13,13 +13,17 @@ import type { Spot } from './src/data/types';
 import { useHoldings } from './src/hooks/useHoldings';
 import { usePlayer } from './src/hooks/usePlayer';
 import { usePosition } from './src/hooks/usePosition';
+import { createClock } from './src/verify/clock';
 import { applyDecay } from './src/verify/decay';
 import { DEFAULT_THRESHOLDS, RELAXED_THRESHOLDS } from './src/verify/thresholds';
+import { windowState } from './src/verify/windowState';
 import { t } from './src/ui/strings';
 import { theme } from './src/ui/theme';
 
 // Desk development only; see .env.example. Read once here so the verify module stays environment-free.
 const thresholds = process.env.EXPO_PUBLIC_RELAXED_GATES ? RELAXED_THRESHOLDS : DEFAULT_THRESHOLDS;
+// The only source of `now`: the wall clock, or the demo instant running from launch. No other module reads the wall clock.
+const clock = createClock(process.env.EXPO_PUBLIC_DEMO_NOW, Date.now);
 
 export default function App() {
   const [selected, setSelected] = useState<Spot | null>(null);
@@ -29,7 +33,7 @@ export default function App() {
   const [mapSpots, setMapSpots] = useState(spots);
   const { holdings: rawHoldings, available, refresh } = useHoldings();
   // Decay is applied once here, at the time of each holdings read; everything below sees only live holdings.
-  const holdings = useMemo(() => applyDecay(rawHoldings, new Date()), [rawHoldings]);
+  const holdings = useMemo(() => applyDecay(rawHoldings, clock.now()), [rawHoldings]);
   const { granted, denied, position } = usePosition();
   const player = usePlayer();
   const me = player.name ?? '';
@@ -51,13 +55,17 @@ export default function App() {
     if (selected || leaderboardOpen) refresh();
   }, [selected, leaderboardOpen, refresh]);
 
+  const now = clock.now();
+  // A closed gem leaves the map and the sheet; a held one still counts on the board, so the leaderboard keeps the full list for names.
+  const visibleSpots = mapSpots.filter((spot) => windowState(spot, now) !== 'closed');
+  const sheetSpot = selected !== null && windowState(selected, now) !== 'closed' ? selected : null;
   // Once the season is over no claim handler is passed, the same path as a missing position, so a late claim cannot move the frozen board.
-  const canClaim = position !== null && player.loaded && !seasonStatus(new Date()).over;
+  const canClaim = position !== null && player.loaded && !seasonStatus(now).over;
 
   return (
     <View style={styles.container}>
       <SpotMap
-        spots={mapSpots}
+        spots={visibleSpots}
         holdings={holdings}
         player={me}
         showsUserLocation={granted}
@@ -90,15 +98,15 @@ export default function App() {
           }}
         />
       )}
-      {selected && (
+      {sheetSpot && (
         <SpotSheet
-          key={`sheet-${selected.id}`}
-          spot={selected}
+          key={`sheet-${sheetSpot.id}`}
+          spot={sheetSpot}
           holdings={holdings}
           holdingsAvailable={available}
           position={position}
           player={me}
-          onClaim={canClaim ? () => setClaiming(selected) : null}
+          onClaim={canClaim ? () => setClaiming(sheetSpot) : null}
           locationDenied={denied}
           onClose={() => setSelected(null)}
         />
@@ -109,6 +117,7 @@ export default function App() {
           holdingsAvailable={available}
           spots={mapSpots}
           player={me}
+          now={now}
           onClose={() => setLeaderboardOpen(false)}
         />
       )}

@@ -1,7 +1,7 @@
 import { headingGlyph, type HeadingGlyph } from '../verify/headingGlyph';
 import type { Bounds } from '../verify/region';
 
-// Leaflet + CARTO Positron page for the Android map (issues #4, #7). Colours arrive resolved from
+// Leaflet + CARTO Voyager page for the Android map (issues #4, #7). Colours arrive resolved from
 // pinState/pinColor and the arrow from headingGlyph; the page script only draws what it is given.
 
 export type MapPin = { id: string; lat: number; lng: number; color: string; heading: number | null };
@@ -53,7 +53,7 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
   window.onerror = function (message) { post({ type: 'error', message: String(message) }); };
   var map = L.map('map', { attributionControl: false, zoomControl: false });
   // URL template per CARTO's basemap-styles README; Leaflet fills {r} with "@2x" on retina screens.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19 }).addTo(map);
   map.fitBounds(${inlineJson(bounds)});
   map.on('click', function () { post({ type: 'deselect' }); });
 

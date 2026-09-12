@@ -11,11 +11,11 @@ A physical place in Linz that can be owned. Defined by coordinates, a reference 
 _Avoid_: pin, point, POI, location (reserved for the festival dataset's `locations` table)
 
 **Gem**:
-A spot that exists only inside a time window, derived from a festival calendar slot. When the window closes it can never be claimed again.
+A spot that exists only inside a window, derived from one outdoor festival location on one festival day (a location-day). Generated from the festival export by `build-gems.js` from the allowlist `data/gem-locations.csv` into `data/gems.json`; worth 30 points, or 50 when a highlighted slot runs there that day. When the window closes it can never be claimed again.
 _Avoid_: ephemeral spot, event, installation
 
 **Window**:
-The start and end time during which a gem is claimable.
+The start and end time during which a gem is claimable: first slot start to last slot end at that location on that day, Linz time.
 
 **Reference photo**:
 The photo a spot's current owner took when claiming it. Challengers reproduce it.
@@ -65,3 +65,7 @@ _Avoid_: round, event period
 **Prize**:
 What the top ranks win at season end. Labels for ranks 1 to 3 live only in the season content module and show next to the rank on the leaderboard.
 _Avoid_: reward, award
+
+**Demo clock**:
+An instant the app starts at instead of the wall clock (`EXPO_PUBLIC_DEMO_NOW`), running on from there by real elapsed time. Created once at the app root (`createClock` in the verify module) and the only source of `now` for decay, the season and gem windows; no other module reads the wall clock as a time source.
+_Avoid_: fake time, frozen time, time travel
