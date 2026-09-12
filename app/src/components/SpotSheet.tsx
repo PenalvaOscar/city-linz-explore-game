@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import type { Holding, Spot } from '../data/types';
 import { photos } from '../data/photos';
 import { formatDistance, ownershipLabel } from '../verify/format';
@@ -20,11 +21,51 @@ const STORY_PREVIEW_LINES = 3;
 
 export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [isTakingPhoto, setIsTakingPhoto] = useState(false);
+
   const state = pinState(spot, holdings, NO_PLAYER);
   const owner = holdings.find((h) => h.spot_id === spot.id)?.player ?? null;
   const distance = position ? distanceM(position, spot) : null;
   const heading = spot.heading === null ? t('headingUnknown') : `${Math.round(spot.heading)}°`;
   const story = spot.story.en;
+
+  const handleClaim = async () => {
+    if (!position) {
+      Alert.alert(t('claimUnavailable'), t('claimRequireLocation'));
+      return;
+    }
+
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (permission.status !== 'granted') {
+      Alert.alert(t('cameraPermissionTitle'), t('cameraPermissionMessage'));
+      return;
+    }
+
+    setIsTakingPhoto(true);
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.8,
+        exif: true,
+      });
+
+      if (result.canceled) return;
+
+      const uri = result.assets?.[0]?.uri ?? null;
+      if (!uri) {
+        Alert.alert(t('claimUnavailable'), t('captureFailed'));
+        return;
+      }
+
+      setPhotoUri(uri);
+    } catch (error) {
+      Alert.alert(t('claimUnavailable'), t('captureFailed'));
+    } finally {
+      setIsTakingPhoto(false);
+    }
+  };
 
   return (
     <View style={styles.card}>
@@ -50,14 +91,16 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
         </Text>
       </View>
       <Text style={styles.meta}>{formatDistance(distance)} · {heading}</Text>
+      {photoUri ? <Image source={{ uri: photoUri }} style={styles.capturedPhoto} resizeMode="cover" /> : null}
       <View style={styles.buttonRow}>
         <Pressable
-          disabled
-          style={styles.claim}
+          onPress={handleClaim}
+          disabled={!position || isTakingPhoto}
+          style={[styles.claim, (!position || isTakingPhoto) && styles.claimDisabled]}
           accessibilityRole="button"
-          accessibilityState={{ disabled: true }}
+          accessibilityState={{ disabled: !position || isTakingPhoto }}
         >
-          <Text style={styles.claimText}>{t('claim')}</Text>
+          <Text style={styles.claimText}>{isTakingPhoto ? t('takingPhoto') : t('claim')}</Text>
         </Pressable>
         {story ? (
           <Pressable
@@ -125,12 +168,18 @@ const styles = StyleSheet.create({
   claim: {
     flex: 1,
     backgroundColor: theme.primary,
-    opacity: theme.disabledOpacity,
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
   },
+  claimDisabled: { opacity: theme.disabledOpacity },
   claimText: { color: theme.white, fontWeight: '700', fontSize: 16 },
+  capturedPhoto: {
+    width: '100%',
+    height: 160,
+    borderRadius: 12,
+    backgroundColor: theme.border,
+  },
   moreInfo: {
     flex: 1,
     borderWidth: 1.5,
