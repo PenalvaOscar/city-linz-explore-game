@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import type { Holding, Spot } from '../data/types';
 import { photos } from '../data/photos';
 import { formatDistance, ownershipLabel } from '../verify/format';
-import { distanceM, type LatLng } from '../verify/geo';
+import { distanceM, headingDiff, type LatLng } from '../verify/geo';
 import { NO_PLAYER, pinState } from '../verify/pinState';
 import { t } from '../ui/strings';
 import { theme } from '../ui/theme';
@@ -29,6 +29,7 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
   const distance = position ? distanceM(position, spot) : null;
   const heading = spot.heading === null ? t('headingUnknown') : `${Math.round(spot.heading)}°`;
   const story = spot.story.en;
+  const referencePhoto = spot.photo.startsWith('http') ? { uri: spot.photo } : photos[spot.photo];
 
   const handleClaim = async () => {
     if (!position) {
@@ -59,6 +60,31 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
         return;
       }
 
+      const spotRadius = spot.radius ?? 40;
+      const distanceFromSpot = distanceM(position, spot);
+      const currentHeading = position.heading;
+      const headingDelta =
+        spot.heading !== null && currentHeading !== null && currentHeading !== undefined
+          ? headingDiff(currentHeading, spot.heading)
+          : null;
+
+      if (distanceFromSpot > spotRadius) {
+        Alert.alert(t('claimUnavailable'), t('claimTooFar'));
+        return;
+      }
+      if (position.accuracy !== null && position.accuracy !== undefined && position.accuracy > 60) {
+        Alert.alert(t('claimUnavailable'), t('claimAccuracy'));
+        return;
+      }
+      if (headingDelta === null) {
+        Alert.alert(t('claimUnavailable'), t('claimHeadingUnavailable'));
+        return;
+      }
+      if (headingDelta > 35) {
+        Alert.alert(t('claimUnavailable'), t('claimWrongHeading'));
+        return;
+      }
+
       setPhotoUri(uri);
     } catch (error) {
       Alert.alert(t('claimUnavailable'), t('captureFailed'));
@@ -73,7 +99,7 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
         <Text style={styles.closeText}>×</Text>
       </Pressable>
       <View style={styles.headerRow}>
-        <Image source={photos[spot.photo]} style={styles.photo} resizeMode="cover" />
+        <Image source={referencePhoto} style={styles.photo} resizeMode="cover" />
         <View style={styles.titleColumn}>
           <Text style={styles.name}>{spot.name.en}</Text>
           {spot.teaser.en ? <Text style={styles.teaser}>{spot.teaser.en}</Text> : null}

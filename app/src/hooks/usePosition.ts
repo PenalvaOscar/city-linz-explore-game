@@ -19,7 +19,13 @@ export function usePosition(): PositionState {
       setGranted(true);
       const watcher = await Location.watchPositionAsync(
         { accuracy: Location.Accuracy.Balanced, timeInterval: 5000, distanceInterval: 5 },
-        (loc) => setPosition({ lat: loc.coords.latitude, lng: loc.coords.longitude }),
+        (loc) =>
+          setPosition({
+            lat: loc.coords.latitude,
+            lng: loc.coords.longitude,
+            heading: loc.coords.heading,
+            accuracy: loc.coords.accuracy,
+          }),
       );
       if (cancelled) {
         watcher.remove();

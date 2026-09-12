@@ -12,6 +12,7 @@ export type Spot = {
   lat: number;
   lng: number;
   heading: number | null;
+  radius?: number;
   kind: SpotKind;
   points: number;
   photo: string;

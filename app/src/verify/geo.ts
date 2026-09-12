@@ -1,4 +1,4 @@
-export type LatLng = { lat: number; lng: number };
+export type LatLng = { lat: number; lng: number; heading?: number | null; accuracy?: number | null };
 
 const EARTH_RADIUS_M = 6371000;
 const toRad = (deg: number) => (deg * Math.PI) / 180;

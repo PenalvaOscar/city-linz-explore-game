@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MAP_ATTRIBUTION, SpotMap } from './src/components/SpotMap';
 import { SpotSheet } from './src/components/SpotSheet';
+import { AddSpotSheet } from './src/components/AddSpotSheet';
 import { spots } from './src/data/spots';
+import { loadRemoteSpots } from './src/data/remoteSpots';
 import type { Spot } from './src/data/types';
 import { useHoldings } from './src/hooks/useHoldings';
 import { usePosition } from './src/hooks/usePosition';
@@ -12,8 +14,23 @@ import { theme } from './src/ui/theme';
 
 export default function App() {
   const [selected, setSelected] = useState<Spot | null>(null);
+  const [addingSpot, setAddingSpot] = useState(false);
+  const [mapSpots, setMapSpots] = useState(spots);
   const { holdings, available, refresh } = useHoldings();
   const { granted, position } = usePosition();
+
+  useEffect(() => {
+    loadRemoteSpots()
+      .then((remoteSpots) => {
+        setMapSpots((current) => {
+          const existing = new Set(current.map((spot) => spot.id));
+          return [...current, ...remoteSpots.filter((spot) => !existing.has(spot.id))];
+        });
+      })
+      .catch(() => {
+        // The bundled map remains usable before the spots table is configured.
+      });
+  }, []);
 
   useEffect(() => {
     if (selected) refresh();
@@ -22,7 +39,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <SpotMap
-        spots={spots}
+        spots={mapSpots}
         holdings={holdings}
         showsUserLocation={granted}
         position={position}
@@ -32,6 +49,20 @@ export default function App() {
         <Text style={styles.wordmark}>{t('appName')}</Text>
         <Text style={styles.tagline}>{t('tagline')}</Text>
       </View>
+      <Pressable onPress={() => { setSelected(null); setAddingSpot(true); }} style={styles.addSpot}>
+        <Text style={styles.addSpotText}>+</Text>
+        <Text style={styles.addSpotLabel}>{t('addSpot')}</Text>
+      </Pressable>
+      {addingSpot && (
+        <AddSpotSheet
+          position={position}
+          onClose={() => setAddingSpot(false)}
+          onCreated={(spot) => {
+            setMapSpots((current) => [...current, spot]);
+            setAddingSpot(false);
+          }}
+        />
+      )}
       {selected && (
         <SpotSheet
           key={selected.id}
@@ -64,6 +95,21 @@ const styles = StyleSheet.create({
   },
   wordmark: { color: theme.primary, fontWeight: '800', fontSize: 22, letterSpacing: 1 },
   tagline: { color: theme.text, fontSize: 14, marginTop: 2 },
+  addSpot: {
+    position: 'absolute',
+    top: 142,
+    right: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: theme.primary,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    elevation: 4,
+  },
+  addSpotText: { color: theme.white, fontSize: 22, lineHeight: 22, fontWeight: '700' },
+  addSpotLabel: { color: theme.white, fontWeight: '700' },
   attribution: {
     position: 'absolute',
     bottom: 24,

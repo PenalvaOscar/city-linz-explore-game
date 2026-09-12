@@ -3,8 +3,23 @@
 -- Safe to re-run: drops and recreates everything.
 
 drop view if exists leaderboard;
+drop table if exists spots;
 drop table if exists claims;
 drop table if exists holdings;
+
+create table spots (
+  id       text primary key,
+  name     text not null,
+  lat      double precision not null,
+  lng      double precision not null,
+  heading  real,
+  radius   real not null default 40,
+  kind     text not null default 'gem',
+  photo    text not null
+);
+
+alter table spots enable row level security;
+create policy spots_open on spots for all using (true) with check (true);
 
 -- ---------------------------------------------------------------
 -- claims: every attempt, passed or failed. This is your real data.
