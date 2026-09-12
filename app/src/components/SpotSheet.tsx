@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Holding, Spot } from '../data/types';
 import { photos } from '../data/photos';
 import { formatDistance, ownershipLabel } from '../verify/format';
-import { distanceM, headingDiff, type LatLng } from '../verify/geo';
-import { NO_PLAYER, pinState } from '../verify/pinState';
+import { distanceM, type LatLng } from '../verify/geo';
+import { pinState } from '../verify/pinState';
 import { t } from '../ui/strings';
 import { theme } from '../ui/theme';
 
@@ -14,84 +13,24 @@ type Props = {
   holdings: Holding[];
   holdingsAvailable: boolean;
   position: LatLng | null;
+  /** The local player's display name; empty until one is stored. */
+  player: string;
+  /** Claim is enabled only when this is set: the app has a position and the player identity has loaded. */
+  onClaim: (() => void) | null;
+  /** Location permission was refused, so Claim can never enable. */
+  locationDenied: boolean;
   onClose: () => void;
 };
 
 const STORY_PREVIEW_LINES = 3;
 
-export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose }: Props) {
+export function SpotSheet({ spot, holdings, holdingsAvailable, position, player, onClaim, locationDenied, onClose }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
-  const [isTakingPhoto, setIsTakingPhoto] = useState(false);
-
-  const state = pinState(spot, holdings, NO_PLAYER);
+  const state = pinState(spot, holdings, player);
   const owner = holdings.find((h) => h.spot_id === spot.id)?.player ?? null;
   const distance = position ? distanceM(position, spot) : null;
   const heading = spot.heading === null ? t('headingUnknown') : `${Math.round(spot.heading)}°`;
   const story = spot.story.en;
-  const referencePhoto = spot.photo.startsWith('http') ? { uri: spot.photo } : photos[spot.photo];
-
-  const handleClaim = async () => {
-    if (!position) {
-      Alert.alert(t('claimUnavailable'), t('claimRequireLocation'));
-      return;
-    }
-
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (permission.status !== 'granted') {
-      Alert.alert(t('cameraPermissionTitle'), t('cameraPermissionMessage'));
-      return;
-    }
-
-    setIsTakingPhoto(true);
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        quality: 0.8,
-        exif: true,
-      });
-
-      if (result.canceled) return;
-
-      const uri = result.assets?.[0]?.uri ?? null;
-      if (!uri) {
-        Alert.alert(t('claimUnavailable'), t('captureFailed'));
-        return;
-      }
-
-      const spotRadius = spot.radius ?? 40;
-      const distanceFromSpot = distanceM(position, spot);
-      const currentHeading = position.heading;
-      const headingDelta =
-        spot.heading !== null && currentHeading !== null && currentHeading !== undefined
-          ? headingDiff(currentHeading, spot.heading)
-          : null;
-
-      if (distanceFromSpot > spotRadius) {
-        Alert.alert(t('claimUnavailable'), t('claimTooFar'));
-        return;
-      }
-      if (position.accuracy !== null && position.accuracy !== undefined && position.accuracy > 60) {
-        Alert.alert(t('claimUnavailable'), t('claimAccuracy'));
-        return;
-      }
-      if (headingDelta === null) {
-        Alert.alert(t('claimUnavailable'), t('claimHeadingUnavailable'));
-        return;
-      }
-      if (headingDelta > 35) {
-        Alert.alert(t('claimUnavailable'), t('claimWrongHeading'));
-        return;
-      }
-
-      setPhotoUri(uri);
-    } catch (error) {
-      Alert.alert(t('claimUnavailable'), t('captureFailed'));
-    } finally {
-      setIsTakingPhoto(false);
-    }
-  };
 
   return (
     <View style={styles.card}>
@@ -99,7 +38,7 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
         <Text style={styles.closeText}>×</Text>
       </Pressable>
       <View style={styles.headerRow}>
-        <Image source={referencePhoto} style={styles.photo} resizeMode="cover" />
+        <Image source={photos[spot.photo]} style={styles.photo} resizeMode="cover" />
         <View style={styles.titleColumn}>
           <Text style={styles.name}>{spot.name.en}</Text>
           {spot.teaser.en ? <Text style={styles.teaser}>{spot.teaser.en}</Text> : null}
@@ -117,18 +56,15 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
         </Text>
       </View>
       <Text style={styles.meta}>{formatDistance(distance)} · {heading}</Text>
-      {photoUri ? <Image source={{ uri: photoUri }} style={styles.capturedPhoto} resizeMode="cover" /> : null}
       <View style={styles.buttonRow}>
         <Pressable
-          onPress={handleClaim}
-          disabled={!position || isTakingPhoto}
-          style={[styles.claim, (!position || isTakingPhoto) && styles.claimDisabled]}
+          onPress={onClaim ?? undefined}
+          disabled={onClaim === null}
+          style={[styles.claim, onClaim === null && styles.claimDisabled]}
           accessibilityRole="button"
-          accessibilityState={{ disabled: !position || isTakingPhoto }}
+          accessibilityState={{ disabled: onClaim === null }}
         >
-          <Text style={styles.claimText}>
-            {isTakingPhoto ? t('takingPhoto') : photoUri ? t('retakePhoto') : t('claim')}
-          </Text>
+          <Text style={styles.claimText}>{t('claim')}</Text>
         </Pressable>
         {story ? (
           <Pressable
@@ -141,6 +77,7 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
           </Pressable>
         ) : null}
       </View>
+      {locationDenied ? <Text style={styles.hint}>{t('locationNeeded')}</Text> : null}
     </View>
   );
 }
@@ -201,13 +138,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   claimDisabled: { opacity: theme.disabledOpacity },
+  hint: { color: theme.muted, fontSize: 13, textAlign: 'center' },
   claimText: { color: theme.white, fontWeight: '700', fontSize: 16 },
-  capturedPhoto: {
-    width: '100%',
-    height: 160,
-    borderRadius: 12,
-    backgroundColor: theme.border,
-  },
   moreInfo: {
     flex: 1,
     borderWidth: 1.5,

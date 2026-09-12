@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { ClaimFlow } from './src/components/claim/ClaimFlow';
 import { MAP_ATTRIBUTION, SpotMap } from './src/components/SpotMap';
 import { SpotSheet } from './src/components/SpotSheet';
 import { AddSpotSheet } from './src/components/AddSpotSheet';
@@ -8,16 +9,24 @@ import { spots } from './src/data/spots';
 import { loadRemoteSpots } from './src/data/remoteSpots';
 import type { Spot } from './src/data/types';
 import { useHoldings } from './src/hooks/useHoldings';
+import { usePlayer } from './src/hooks/usePlayer';
 import { usePosition } from './src/hooks/usePosition';
+import { DEFAULT_THRESHOLDS, RELAXED_THRESHOLDS } from './src/verify/thresholds';
 import { t } from './src/ui/strings';
 import { theme } from './src/ui/theme';
 
+// Desk development only; see .env.example. Read once here so the verify module stays environment-free.
+const thresholds = process.env.EXPO_PUBLIC_RELAXED_GATES ? RELAXED_THRESHOLDS : DEFAULT_THRESHOLDS;
+
 export default function App() {
   const [selected, setSelected] = useState<Spot | null>(null);
+  const [claiming, setClaiming] = useState<Spot | null>(null);
   const [addingSpot, setAddingSpot] = useState(false);
   const [mapSpots, setMapSpots] = useState(spots);
   const { holdings, available, refresh } = useHoldings();
-  const { granted, position } = usePosition();
+  const { granted, denied, position } = usePosition();
+  const player = usePlayer();
+  const me = player.name ?? '';
 
   useEffect(() => {
     loadRemoteSpots()
@@ -28,7 +37,7 @@ export default function App() {
         });
       })
       .catch(() => {
-        // The bundled map remains usable before the spots table is configured.
+        // Bundled spots remain usable when Supabase is not configured.
       });
   }, []);
 
@@ -36,11 +45,14 @@ export default function App() {
     if (selected) refresh();
   }, [selected, refresh]);
 
+  const canClaim = position !== null && player.loaded;
+
   return (
     <View style={styles.container}>
       <SpotMap
         spots={mapSpots}
         holdings={holdings}
+        player={me}
         showsUserLocation={granted}
         position={position}
         onSelect={setSelected}
@@ -65,17 +77,39 @@ export default function App() {
       )}
       {selected && (
         <SpotSheet
-          key={selected.id}
+          key={`sheet-${selected.id}`}
           spot={selected}
           holdings={holdings}
           holdingsAvailable={available}
           position={position}
+          player={me}
+          onClaim={canClaim ? () => setClaiming(selected) : null}
+          locationDenied={denied}
           onClose={() => setSelected(null)}
         />
       )}
       <View style={styles.attribution} pointerEvents="none">
         <Text style={styles.attributionText}>{t('attribution')} {MAP_ATTRIBUTION}</Text>
       </View>
+      {claiming && (
+        <ClaimFlow
+          key={`claim-${claiming.id}`}
+          spot={claiming}
+          player={player.name}
+          setPlayer={player.setName}
+          thresholds={thresholds}
+          onClose={() => {
+            setClaiming(null);
+            refresh(); // a claim abandoned while saving may still have landed
+          }}
+          onDone={() => {
+            setClaiming(null);
+            setSelected(null);
+            refresh();
+          }}
+          onSaved={refresh}
+        />
+      )}
       <StatusBar style="dark" />
     </View>
   );

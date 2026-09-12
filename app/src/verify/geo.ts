@@ -16,3 +16,8 @@ export function distanceM(a: LatLng, b: LatLng): number {
 export function headingDiff(a: number, b: number): number {
   return Math.abs(((a - b + 540) % 360) - 180);
 }
+
+/** Signed turn from `heading` to `target` in degrees, in [−180, 180): positive is clockwise (right). */
+export function headingTurn(heading: number, target: number): number {
+  return ((target - heading + 540) % 360) - 180;
+}

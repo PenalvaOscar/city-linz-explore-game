@@ -100,7 +100,7 @@
     "window": null
   },
   {
-    "id": "mariendom",
+    "id": "new-cathedral",
     "name": {
       "en": "New Cathedral",
       "de": "Mariendom"
@@ -111,12 +111,12 @@
     "story": {
       "en": ""
     },
-    "lat": 48.3005623,
-    "lng": 14.28674828,
-    "heading": null,
-    "kind": "linz",
-    "points": 10,
-    "photo": "mariendom.jpg",
+    "lat": 48.3005078,
+    "lng": 14.2868881,
+    "heading": 230,
+    "kind": "gem",
+    "points": 30,
+    "photo": "new-cathedral.jpg",
     "window": null
   },
   {

@@ -5,7 +5,7 @@ import type { Holding, Spot } from '../data/types';
 import type { LatLng } from '../verify/geo';
 import { headingGlyph } from '../verify/headingGlyph';
 import { initialRegion } from '../verify/region';
-import { NO_PLAYER, pinState } from '../verify/pinState';
+import { pinState } from '../verify/pinState';
 import { pinColor, theme } from '../ui/theme';
 
 // Single component wrapping react-native-maps so a later MapLibre swap stays contained (ADR-0001).
@@ -15,13 +15,15 @@ export const MAP_ATTRIBUTION = 'Map: Apple Maps';
 type Props = {
   spots: Spot[];
   holdings: Holding[];
+  /** The local player's display name; empty until one is stored. */
+  player: string;
   showsUserLocation: boolean;
   /** Drawn by the Android page; native maps draw their own blue dot. */
   position: LatLng | null;
   onSelect: (spot: Spot | null) => void;
 };
 
-export function SpotMap({ spots, holdings, showsUserLocation, onSelect }: Props) {
+export function SpotMap({ spots, holdings, player, showsUserLocation, onSelect }: Props) {
   return (
     <MapView
       style={StyleSheet.absoluteFill}
@@ -40,7 +42,7 @@ export function SpotMap({ spots, holdings, showsUserLocation, onSelect }: Props)
             onSelect(s);
           }}
         >
-          <Pin color={pinColor[pinState(s, holdings, NO_PLAYER)]} heading={s.heading} />
+          <Pin color={pinColor[pinState(s, holdings, player)]} heading={s.heading} />
         </Marker>
       ))}
     </MapView>
