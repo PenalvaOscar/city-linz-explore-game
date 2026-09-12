@@ -2,12 +2,12 @@ import { headingGlyph, type HeadingGlyph } from '../verify/headingGlyph';
 import type { Bounds } from '../verify/region';
 
 // Leaflet + CARTO Voyager page for the Android map (issues #4, #7). Colours arrive resolved from
-// pinState/pinColor and the arrow from headingGlyph; the page script only draws what it is given.
+// pinState/pinColor/pinOutlineColor and the arrow from headingGlyph; the page script only draws what it is given.
 
-export type MapPin = { id: string; lat: number; lng: number; color: string; heading: number | null };
+export type MapPin = { id: string; lat: number; lng: number; color: string; outline: string; heading: number | null; gem: boolean };
 
 /** What the page script receives per pin: the heading already reduced to its glyph. */
-type PagePin = { id: string; lat: number; lng: number; color: string; arrow: HeadingGlyph | null };
+type PagePin = { id: string; lat: number; lng: number; color: string; outline: string; arrow: HeadingGlyph | null; gem: boolean };
 
 export type MapMessage =
   | { type: 'ready' }
@@ -15,7 +15,7 @@ export type MapMessage =
   | { type: 'deselect' }
   | { type: 'error'; message: string };
 
-type PageInput = { pins: MapPin[]; bounds: Bounds; playerColor: string };
+type PageInput = { pins: MapPin[]; bounds: Bounds; playerColor: string; gemColor: string };
 
 // Pinned build; hashes computed from the unpkg files, and identical to the ones on leafletjs.com/download.
 const LEAFLET_VERSION = '1.9.4';
@@ -25,14 +25,14 @@ const LEAFLET_JS_SRI = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
 /** JSON that is safe to inline inside a `<script>` block. */
 const inlineJson = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
 
-const toPagePin = ({ heading, ...pin }: MapPin): PagePin => ({ ...pin, arrow: headingGlyph(heading) });
+const toPagePin = ({ heading, gem, ...pin }: MapPin): PagePin => ({ ...pin, arrow: headingGlyph(heading), gem });
 
 /** The one call that hands pins to the page, used both inline at build time and later via injectJavaScript. */
 export function setPinsScript(pins: MapPin[]): string {
   return `window.setPins(${inlineJson(pins.map(toPagePin))}); true;`;
 }
 
-export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): string {
+export function buildLeafletPage({ pins, bounds, playerColor, gemColor }: PageInput): string {
   return `<!doctype html>
 <html>
 <head>
@@ -57,7 +57,10 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
   map.fitBounds(${inlineJson(bounds)});
   map.on('click', function () { post({ type: 'deselect' }); });
 
-  var pinIcon = function (color, arrow) {
+  // A gem pin carries a small diamond over the head's top-right rim, whatever its ownership colour;
+  // its outline arrives already resolved with the pin, like the fill.
+  var gemMarker = '<path d="M20 1L25 6L20 11L15 6z" fill="' + ${inlineJson(gemColor)} + '" stroke="#fff" stroke-width="1.5"/>';
+  var pinIcon = function (color, outline, arrow, gem) {
     var centre = arrow
       ? '<path d="M13 7.5L18.5 18.5H7.5z" fill="#fff" transform="rotate(' + arrow.rotation + ' 13 13)"/>'
       : '<circle cx="13" cy="13" r="4.5" fill="#fff"/>';
@@ -66,8 +69,8 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
       iconSize: [26, 36],
       iconAnchor: [13, 36],
       html: '<svg class="pin" viewBox="0 0 26 36" xmlns="http://www.w3.org/2000/svg">' +
-        '<path d="M13 0C5.8 0 0 5.8 0 13c0 9.5 13 23 13 23s13-13.5 13-23C26 5.8 20.2 0 13 0z" fill="' + color + '" stroke="#fff" stroke-width="1.5"/>' +
-        centre + '</svg>'
+        '<path d="M13 0C5.8 0 0 5.8 0 13c0 9.5 13 23 13 23s13-13.5 13-23C26 5.8 20.2 0 13 0z" fill="' + color + '" stroke="' + outline + '" stroke-width="1.5"/>' +
+        centre + (gem ? gemMarker : '') + '</svg>'
     });
   };
 
@@ -80,7 +83,7 @@ export function buildLeafletPage({ pins, bounds, playerColor }: PageInput): stri
         m.on('click', function () { post({ type: 'select', id: p.id }); });
         markers[p.id] = m;
       }
-      m.setIcon(pinIcon(p.color, p.arrow));
+      m.setIcon(pinIcon(p.color, p.outline, p.arrow, p.gem));
     });
   };
 

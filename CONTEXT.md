@@ -11,7 +11,7 @@ A physical place in Linz that can be owned. Defined by coordinates, a reference 
 _Avoid_: pin, point, POI, location (reserved for the festival dataset's `locations` table)
 
 **Gem**:
-A spot that exists only inside a window, derived from one outdoor festival location on one festival day (a location-day). Generated from the festival export by `build-gems.js` from the allowlist `data/gem-locations.csv` into `data/gems.json`; worth 30 points, or 50 when a highlighted slot runs there that day. When the window closes it can never be claimed again.
+A spot that exists only inside a window, derived from one outdoor festival location on one festival day (a location-day). Generated from the festival export by `build-gems.js` from the allowlist `data/gem-locations.csv` into `data/gems.json`; worth 30 points, or 50 when a highlighted slot runs there that day. Earlier on the window's day it is *upcoming*: on the map in grey with its opening time on the sheet and no claim handler; inside the window it is claimed, stolen and reclaimed like any spot and its pin takes the ownership colour. A gem marker on the pin tells it apart from a Linz spot whoever holds it. When the window closes the pin leaves the map and it can never be claimed again; a holding on it stays and counts on the leaderboard until it decays.
 _Avoid_: ephemeral spot, event, installation
 
 **Window**:

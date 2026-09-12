@@ -5,7 +5,7 @@ import type { Holding, Spot } from '../data/types';
 import type { LatLng } from '../verify/geo';
 import { initialRegion, regionToBounds } from '../verify/region';
 import { pinState } from '../verify/pinState';
-import { pinColor, theme } from '../ui/theme';
+import { gemMarkerColor, pinColor, pinOutlineColor, theme } from '../ui/theme';
 import { buildLeafletPage, parseMapMessage, setPinsScript, type MapPin } from './leafletPage';
 
 // Android fallback for Expo Go, where the embedded Google Maps key is rejected (issue #4):
@@ -19,10 +19,12 @@ type Props = {
   player: string;
   showsUserLocation: boolean;
   position: LatLng | null;
+  /** The app clock's `now` at render, for the upcoming state of gem pins. */
+  now: Date;
   onSelect: (spot: Spot | null) => void;
 };
 
-export function SpotMap({ spots, holdings, player, showsUserLocation, position, onSelect }: Props) {
+export function SpotMap({ spots, holdings, player, showsUserLocation, position, now, onSelect }: Props) {
   const webview = useRef<WebView>(null);
   // Set by the page's own `ready` message, not onLoadEnd, so injected calls never race the inline script.
   const [ready, setReady] = useState(false);
@@ -33,16 +35,18 @@ export function SpotMap({ spots, holdings, player, showsUserLocation, position, 
         id: s.id,
         lat: s.lat,
         lng: s.lng,
-        color: pinColor[pinState(s, holdings, player)],
+        color: pinColor[pinState(s, holdings, player, now)],
+        outline: pinOutlineColor(s.kind === 'gem'),
         heading: s.heading,
+        gem: s.kind === 'gem',
       })),
-    [spots, holdings, player],
+    [spots, holdings, player, now],
   );
   const playerPosition = showsUserLocation ? position : null;
 
   // The page is built once; later changes go over injectJavaScript so the map keeps its viewport.
   const [html] = useState(() =>
-    buildLeafletPage({ pins, bounds: regionToBounds(initialRegion(spots)), playerColor: theme.primary }),
+    buildLeafletPage({ pins, bounds: regionToBounds(initialRegion(spots)), playerColor: theme.primary, gemColor: gemMarkerColor }),
   );
 
   useEffect(() => {

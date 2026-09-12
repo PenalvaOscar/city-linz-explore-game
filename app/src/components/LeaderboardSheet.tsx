@@ -5,7 +5,7 @@ import type { Holding, Spot } from '../data/types';
 import { formatRemaining } from '../verify/format';
 import { boardRows, rankPlayers, type LeaderboardRow } from '../verify/leaderboard';
 import { t } from '../ui/strings';
-import { pinColor, theme } from '../ui/theme';
+import { theme } from '../ui/theme';
 
 type Props = {
   /** Live holdings, the same decayed array the map consumes. */
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     left: 12,
     right: 12,
     top: 56,
-    bottom: 48,
+    bottom: 112,
     backgroundColor: theme.white,
     borderRadius: 16,
     padding: 14,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   closeText: { color: theme.text, fontSize: 18, lineHeight: 20 },
-  title: { fontSize: 20, fontWeight: '700', color: theme.text, paddingRight: 28 },
+  title: { fontSize: 20, fontWeight: '800', color: theme.primary, paddingRight: 28 },
   season: { color: theme.muted, fontSize: 13, marginTop: -6 },
   empty: { flex: 1, color: theme.muted, textAlign: 'center', paddingVertical: 24 },
   list: { gap: 4 },
@@ -137,14 +137,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
   },
-  rowMine: { backgroundColor: theme.badgeOwnership },
+  rowMine: { backgroundColor: theme.pinkSoft },
   rank: { width: 28, fontWeight: '700', color: theme.muted, textAlign: 'right' },
   playerColumn: { flex: 1 },
   player: { fontWeight: '700', color: theme.text },
   prize: { color: theme.primary, fontSize: 12, fontWeight: '600' },
   spots: { color: theme.muted, fontSize: 13 },
   points: { fontWeight: '700', color: theme.text, minWidth: 56, textAlign: 'right' },
-  textMine: { color: pinColor.mine },
+  textMine: { color: theme.accentPink },
   heldRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 10, paddingLeft: 48, paddingRight: 10, paddingVertical: 6 },
   heldName: { flex: 1, color: theme.text },
   heldPoints: { color: theme.muted, fontSize: 13 },
