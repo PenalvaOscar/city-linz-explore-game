@@ -6,7 +6,7 @@ import type { LatLng } from '../verify/geo';
 import { headingGlyph } from '../verify/headingGlyph';
 import { initialRegion } from '../verify/region';
 import { pinState } from '../verify/pinState';
-import { gemMarkerColor, pinColor, theme } from '../ui/theme';
+import { gemMarkerColor, pinColor, pinOutlineColor, theme } from '../ui/theme';
 
 // Single component wrapping react-native-maps so a later MapLibre swap stays contained (ADR-0001).
 // Android resolves to SpotMap.android.tsx (Leaflet in a WebView, issue #4); this file serves iOS.
@@ -57,7 +57,7 @@ export function SpotMap({ spots, holdings, player, showsUserLocation, now, onSel
 // over the head's top-right rim. The outline is white, or the gem colour on a gem pin.
 function Pin({ color, heading, gem }: { color: string; heading: number | null; gem: boolean }) {
   const glyph = headingGlyph(heading);
-  const outline = gem ? gemMarkerColor : theme.white;
+  const outline = pinOutlineColor(gem);
   return (
     <View style={styles.pin}>
       <View style={[styles.tailOutline, { borderTopColor: outline }]} />

@@ -1,8 +1,8 @@
 import { buildLeafletPage, parseMapMessage, setPinsScript, type MapPin } from './leafletPage';
 
 const pins: MapPin[] = [
-  { id: 'lentos', lat: 48.30962, lng: 14.28445, color: '#9E9E9E', heading: null, gem: false },
-  { id: 'ars', lat: 48.3005623, lng: 14.28674828, color: '#7B1FA2', heading: 214, gem: true },
+  { id: 'lentos', lat: 48.30962, lng: 14.28445, color: '#9E9E9E', outline: '#FFFFFF', heading: null, gem: false },
+  { id: 'ars', lat: 48.3005623, lng: 14.28674828, color: '#7B1FA2', outline: '#E5007D', heading: 214, gem: true },
 ];
 const bounds: [[number, number], [number, number]] = [
   [48.29, 14.26],
@@ -22,17 +22,19 @@ describe('buildLeafletPage', () => {
     expect(html).toContain('[[48.29,14.26],[48.31,14.3]]');
   });
   it('gives only pins with a heading an arrow, next to their colour', () => {
-    expect(html).toContain('"color":"#7B1FA2","arrow":{"rotation":214}');
-    expect(html).toContain('"color":"#9E9E9E","arrow":null');
+    expect(html).toContain('"color":"#7B1FA2","outline":"#E5007D","arrow":{"rotation":214}');
+    expect(html).toContain('"color":"#9E9E9E","outline":"#FFFFFF","arrow":null');
     expect(html.match(/"arrow":\{/g)).toHaveLength(1);
   });
   it('marks gem pins as gems next to their ownership colour, and draws the marker in the gem colour', () => {
-    expect(html).toContain('"color":"#7B1FA2","arrow":{"rotation":214},"gem":true');
-    expect(html).toContain('"color":"#9E9E9E","arrow":null,"gem":false');
+    expect(html).toContain('"color":"#7B1FA2","outline":"#E5007D","arrow":{"rotation":214},"gem":true');
+    expect(html).toContain('"color":"#9E9E9E","outline":"#FFFFFF","arrow":null,"gem":false');
     expect(html).toContain('"#E5007D"');
   });
-  it('outlines gem pins in the gem colour and the rest in white', () => {
-    expect(html).toContain(`var outline = gem ? "#E5007D" : '#fff'`);
+  it('embeds every pin with its resolved outline, and lets the page draw it', () => {
+    expect(html).toContain('"color":"#9E9E9E","outline":"#FFFFFF"');
+    expect(html).toContain('"color":"#7B1FA2","outline":"#E5007D"');
+    expect(html).toContain('pinIcon(p.color, p.outline, p.arrow, p.gem)');
   });
   it('uses CARTO Voyager tiles, not OpenStreetMap standard, without browser geolocation', () => {
     expect(html).toContain('basemaps.cartocdn.com/rastertiles/voyager/');
@@ -48,7 +50,7 @@ describe('buildLeafletPage', () => {
   });
   it('does not break out of the script tag when a pin id contains one', () => {
     const evil = buildLeafletPage({
-      pins: [{ id: '</script><script>alert(1)', lat: 0, lng: 0, color: '#000', heading: null, gem: false }],
+      pins: [{ id: '</script><script>alert(1)', lat: 0, lng: 0, color: '#000', outline: '#000', heading: null, gem: false }],
       bounds,
       playerColor: '#000',
       gemColor: '#000',
@@ -61,8 +63,8 @@ describe('setPinsScript', () => {
   it('sends the same pin shape the page was built with', () => {
     const script = setPinsScript(pins);
     expect(script).toContain('window.setPins([');
-    expect(script).toContain('"color":"#7B1FA2","arrow":{"rotation":214},"gem":true');
-    expect(script).toContain('"color":"#9E9E9E","arrow":null,"gem":false');
+    expect(script).toContain('"color":"#7B1FA2","outline":"#E5007D","arrow":{"rotation":214},"gem":true');
+    expect(script).toContain('"color":"#9E9E9E","outline":"#FFFFFF","arrow":null,"gem":false');
     expect(script).not.toContain('"heading"');
   });
 });

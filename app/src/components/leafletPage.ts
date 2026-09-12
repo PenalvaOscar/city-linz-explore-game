@@ -2,12 +2,12 @@ import { headingGlyph, type HeadingGlyph } from '../verify/headingGlyph';
 import type { Bounds } from '../verify/region';
 
 // Leaflet + CARTO Voyager page for the Android map (issues #4, #7). Colours arrive resolved from
-// pinState/pinColor and the arrow from headingGlyph; the page script only draws what it is given.
+// pinState/pinColor/pinOutlineColor and the arrow from headingGlyph; the page script only draws what it is given.
 
-export type MapPin = { id: string; lat: number; lng: number; color: string; heading: number | null; gem: boolean };
+export type MapPin = { id: string; lat: number; lng: number; color: string; outline: string; heading: number | null; gem: boolean };
 
 /** What the page script receives per pin: the heading already reduced to its glyph. */
-type PagePin = { id: string; lat: number; lng: number; color: string; arrow: HeadingGlyph | null; gem: boolean };
+type PagePin = { id: string; lat: number; lng: number; color: string; outline: string; arrow: HeadingGlyph | null; gem: boolean };
 
 export type MapMessage =
   | { type: 'ready' }
@@ -57,11 +57,10 @@ export function buildLeafletPage({ pins, bounds, playerColor, gemColor }: PageIn
   map.fitBounds(${inlineJson(bounds)});
   map.on('click', function () { post({ type: 'deselect' }); });
 
-  // A gem pin carries a small diamond over the head's top-right rim and swaps the white outline for
-  // the gem colour, whatever its ownership colour, so it reads as a gem from a distance.
+  // A gem pin carries a small diamond over the head's top-right rim, whatever its ownership colour;
+  // its outline arrives already resolved with the pin, like the fill.
   var gemMarker = '<path d="M20 1L25 6L20 11L15 6z" fill="' + ${inlineJson(gemColor)} + '" stroke="#fff" stroke-width="1.5"/>';
-  var pinIcon = function (color, arrow, gem) {
-    var outline = gem ? ${inlineJson(gemColor)} : '#fff';
+  var pinIcon = function (color, outline, arrow, gem) {
     var centre = arrow
       ? '<path d="M13 7.5L18.5 18.5H7.5z" fill="#fff" transform="rotate(' + arrow.rotation + ' 13 13)"/>'
       : '<circle cx="13" cy="13" r="4.5" fill="#fff"/>';
@@ -84,7 +83,7 @@ export function buildLeafletPage({ pins, bounds, playerColor, gemColor }: PageIn
         m.on('click', function () { post({ type: 'select', id: p.id }); });
         markers[p.id] = m;
       }
-      m.setIcon(pinIcon(p.color, p.arrow, p.gem));
+      m.setIcon(pinIcon(p.color, p.outline, p.arrow, p.gem));
     });
   };
 

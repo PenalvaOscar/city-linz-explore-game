@@ -22,8 +22,11 @@ export const theme = {
   backdrop: 'rgba(0,0,0,0.4)',
 } as const;
 
-/** The gem marker and outline drawn on a gem pin over its ownership colour, on both maps (issue #21). */
+/** The gem marker drawn on a gem pin over its ownership colour, on both maps. */
 export const gemMarkerColor = theme.accentPink;
+
+/** The pin's outline: white, or the gem colour on a gem pin so it reads as a gem from a distance (issue #21). */
+export const pinOutlineColor = (gem: boolean): string => (gem ? gemMarkerColor : theme.white);
 
 /**
  * The only mapping from pin state to colour; components must not decide colours themselves.

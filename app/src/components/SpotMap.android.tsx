@@ -5,7 +5,7 @@ import type { Holding, Spot } from '../data/types';
 import type { LatLng } from '../verify/geo';
 import { initialRegion, regionToBounds } from '../verify/region';
 import { pinState } from '../verify/pinState';
-import { gemMarkerColor, pinColor, theme } from '../ui/theme';
+import { gemMarkerColor, pinColor, pinOutlineColor, theme } from '../ui/theme';
 import { buildLeafletPage, parseMapMessage, setPinsScript, type MapPin } from './leafletPage';
 
 // Android fallback for Expo Go, where the embedded Google Maps key is rejected (issue #4):
@@ -36,6 +36,7 @@ export function SpotMap({ spots, holdings, player, showsUserLocation, position, 
         lat: s.lat,
         lng: s.lng,
         color: pinColor[pinState(s, holdings, player, now)],
+        outline: pinOutlineColor(s.kind === 'gem'),
         heading: s.heading,
         gem: s.kind === 'gem',
       })),
