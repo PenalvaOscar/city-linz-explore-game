@@ -1,4 +1,4 @@
-import { applyDecay, DECAY_DAYS } from './decay';
+import { applyDecay } from './decay';
 import { ownershipLabel } from './format';
 import { pinState } from './pinState';
 import type { Holding, Spot } from '../data/types';
@@ -21,9 +21,6 @@ const lentos: Spot = {
 };
 
 describe('applyDecay', () => {
-  it('decays after 14 days', () => {
-    expect(DECAY_DAYS).toBe(14);
-  });
   it('keeps a holding 13 days 23 hours old', () => {
     const h = holding('lentos', daysAgo(13 + 23 / 24));
     expect(applyDecay([h], now)).toEqual([h]);
@@ -41,6 +38,10 @@ describe('applyDecay', () => {
   });
   it('returns empty for empty input', () => {
     expect(applyDecay([], now)).toEqual([]);
+  });
+  it('parses the timestamptz shape Supabase returns (microseconds, +00:00 offset)', () => {
+    const h = holding('lentos', '2026-09-14T12:00:00.123456+00:00');
+    expect(applyDecay([h], now)).toEqual([h]);
   });
   it('drops a holding whose held_since does not parse', () => {
     expect(applyDecay([holding('lentos', 'not a date')], now)).toEqual([]);

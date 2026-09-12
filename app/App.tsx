@@ -98,6 +98,7 @@ export default function App() {
         <ClaimFlow
           key={`claim-${claiming.id}`}
           spot={claiming}
+          holdings={holdings}
           player={player.name}
           setPlayer={player.setName}
           thresholds={thresholds}

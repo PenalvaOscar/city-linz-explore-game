@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { claimSpot } from '../data/claimSpot';
 import { uploadClaimPhoto } from '../data/uploadClaimPhoto';
-import type { Spot } from '../data/types';
+import type { Holding, Spot } from '../data/types';
 import { initialClaimState, transition } from '../verify/claimMachine';
 import type { Thresholds } from '../verify/thresholds';
 import { useFlowPosition, type PositionSample } from './useFlowPosition';
@@ -9,6 +9,8 @@ import { useHeading } from './useHeading';
 
 type Args = {
   spot: Spot;
+  /** The holdings still in force (decay already applied), so a decayed spot reads as claimed, not stolen. */
+  holdings: Holding[];
   /** The stored display name, or null when the flow must ask for it first. */
   player: string | null;
   thresholds: Thresholds;
@@ -23,7 +25,7 @@ type Args = {
  * while dwelling, the `claim_spot` call while evaluating, and the photo upload once the claim row
  * exists. Holds no rules of its own.
  */
-export function useClaimFlow({ spot, player, thresholds, onClose, onSaved }: Args) {
+export function useClaimFlow({ spot, holdings, player, thresholds, onClose, onSaved }: Args) {
   const [state, dispatch] = useReducer(transition, { spot, thresholds, hasName: player !== null }, initialClaimState);
 
   const onSample = useCallback((s: PositionSample) => dispatch({ type: 'position', ...s }), []);
@@ -56,7 +58,9 @@ export function useClaimFlow({ spot, player, thresholds, onClose, onSaved }: Arg
     })
       .then((saved) => {
         if (cancelled) return;
-        dispatch({ type: 'saved', ...saved });
+        // The server still holds the decayed row, so a spot that showed as free is reported as claimed, not stolen.
+        const liveOwner = holdings.find((h) => h.spot_id === spot.id)?.player ?? null;
+        dispatch({ type: 'saved', ...saved, previousOwner: liveOwner === null ? null : saved.previousOwner });
         if (state.result?.pass) onSaved();
         // Photo proof for every saved attempt, passed or not, rides behind the result: a failed
         // upload is logged and the claim stands.
