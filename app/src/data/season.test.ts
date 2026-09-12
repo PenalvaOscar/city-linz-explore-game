@@ -1,10 +1,10 @@
 import { PRIZES, SEASON_END, prizeFor, seasonStatus } from './season';
 
-const end = new Date('2026-09-26T21:59:59Z');
+const end = new Date('2026-09-26T22:00:00Z');
 
 describe('seasonStatus', () => {
   it('is not over before the end, with positive remaining time', () => {
-    const status = seasonStatus(new Date('2026-09-25T21:59:59Z'), end);
+    const status = seasonStatus(new Date('2026-09-25T22:00:00Z'), end);
     expect(status.over).toBe(false);
     expect(status.remainingMs).toBe(24 * 60 * 60 * 1000);
   });

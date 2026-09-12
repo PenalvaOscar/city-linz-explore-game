@@ -57,3 +57,11 @@ The minimum time a player must remain within range before the camera unlocks. Pr
 
 **Leaderboard**:
 Ranking of players by the summed points of spots they currently own. Not lifetime points. Ties break by number of spots (more first), then by the earliest of each player's most recent `held_since` (whoever reached their standing first wins). Ranks are 1-based with no gaps (`rankPlayers` in the verify module, fed the same decayed holdings the map uses).
+
+**Season**:
+The period during which claims count towards the leaderboard. It ends at a single configured instant (`SEASON_END` in the season content module); from that instant the board is frozen and no claim handler is offered.
+_Avoid_: round, event period
+
+**Prize**:
+What the top ranks win at season end. Labels for ranks 1 to 3 live only in the season content module and show next to the rank on the leaderboard.
+_Avoid_: reward, award
