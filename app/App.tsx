@@ -8,6 +8,7 @@ import { AddSpotSheet } from './src/components/AddSpotSheet';
 import { LeaderboardSheet } from './src/components/LeaderboardSheet';
 import { spots } from './src/data/spots';
 import { loadRemoteSpots } from './src/data/remoteSpots';
+import { seasonStatus } from './src/data/season';
 import type { Spot } from './src/data/types';
 import { useHoldings } from './src/hooks/useHoldings';
 import { usePlayer } from './src/hooks/usePlayer';
@@ -50,7 +51,8 @@ export default function App() {
     if (selected || leaderboardOpen) refresh();
   }, [selected, leaderboardOpen, refresh]);
 
-  const canClaim = position !== null && player.loaded;
+  // Once the season is over no claim handler is passed, the same path as a missing position, so a late claim cannot move the frozen board.
+  const canClaim = position !== null && player.loaded && !seasonStatus(new Date()).over;
 
   return (
     <View style={styles.container}>

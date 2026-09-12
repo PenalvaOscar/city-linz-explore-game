@@ -8,6 +8,20 @@ export function formatDistance(metres: number | null): string {
   return `${(metres / 1000).toFixed(1)} km`;
 }
 
+const MINUTE_MS = 60 * 1000;
+const HOUR_MS = 60 * MINUTE_MS;
+const DAY_MS = 24 * HOUR_MS;
+
+/** Time left for the season countdown: days and hours from a day on, hours and minutes below, minutes only below an hour. */
+export function formatRemaining(ms: number): string {
+  const days = Math.floor(ms / DAY_MS);
+  const hours = Math.floor((ms % DAY_MS) / HOUR_MS);
+  const minutes = Math.floor((ms % HOUR_MS) / MINUTE_MS);
+  if (days > 0) return `${days} d ${hours} h`;
+  if (hours > 0) return `${hours} h ${minutes} min`;
+  return `${minutes} min`;
+}
+
 /** Ownership line for the spot sheet. `available` is false when the holdings read failed. */
 export function ownershipLabel(state: PinState, owner: string | null, available: boolean): string {
   if (state === 'gem') return t('gem');
