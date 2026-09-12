@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { ClaimFlow } from './src/components/claim/ClaimFlow';
@@ -11,6 +11,7 @@ import type { Spot } from './src/data/types';
 import { useHoldings } from './src/hooks/useHoldings';
 import { usePlayer } from './src/hooks/usePlayer';
 import { usePosition } from './src/hooks/usePosition';
+import { applyDecay } from './src/verify/decay';
 import { DEFAULT_THRESHOLDS, RELAXED_THRESHOLDS } from './src/verify/thresholds';
 import { t } from './src/ui/strings';
 import { theme } from './src/ui/theme';
@@ -23,7 +24,9 @@ export default function App() {
   const [claiming, setClaiming] = useState<Spot | null>(null);
   const [addingSpot, setAddingSpot] = useState(false);
   const [mapSpots, setMapSpots] = useState(spots);
-  const { holdings, available, refresh } = useHoldings();
+  const { holdings: rawHoldings, available, refresh } = useHoldings();
+  // Decay is applied once here, at the time of each holdings read; everything below sees only live holdings.
+  const holdings = useMemo(() => applyDecay(rawHoldings, new Date()), [rawHoldings]);
   const { granted, denied, position } = usePosition();
   const player = usePlayer();
   const me = player.name ?? '';

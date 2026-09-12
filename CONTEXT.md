@@ -46,7 +46,7 @@ A successful claim by the current owner on their own spot. Resets the decay time
 The player whose claim on a spot is the most recent one still in force.
 
 **Decay**:
-Loss of ownership when the owner has not reclaimed for the decay period (14 days). A decayed spot is free.
+Loss of ownership when the owner has not reclaimed for the decay period (14 days). A decayed spot is free. In this version decay is applied in the app from the holding's `held_since` (`applyDecay` in the verify module, once at the app root); the server row stays until the next passing claim overwrites it.
 _Avoid_: grip, expiry
 
 **Verification**:
