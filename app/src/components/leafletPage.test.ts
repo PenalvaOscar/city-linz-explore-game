@@ -26,8 +26,8 @@ describe('buildLeafletPage', () => {
     expect(html).toContain('"color":"#9E9E9E","arrow":null');
     expect(html.match(/"arrow":\{/g)).toHaveLength(1);
   });
-  it('uses CARTO Positron tiles, not OpenStreetMap standard, without browser geolocation', () => {
-    expect(html).toContain('basemaps.cartocdn.com/light_all/');
+  it('uses CARTO Voyager tiles, not OpenStreetMap standard, without browser geolocation', () => {
+    expect(html).toContain('basemaps.cartocdn.com/rastertiles/voyager/');
     expect(html).not.toContain('tile.openstreetmap.org');
     expect(html).not.toContain('navigator.geolocation');
   });

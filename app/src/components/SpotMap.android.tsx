@@ -9,7 +9,7 @@ import { pinColor, theme } from '../ui/theme';
 import { buildLeafletPage, parseMapMessage, setPinsScript, type MapPin } from './leafletPage';
 
 // Android fallback for Expo Go, where the embedded Google Maps key is rejected (issue #4):
-// Leaflet + CARTO Positron tiles in a WebView, no API key. iOS keeps react-native-maps in SpotMap.tsx.
+// Leaflet + CARTO Voyager tiles in a WebView, no API key. iOS keeps react-native-maps in SpotMap.tsx.
 export const MAP_ATTRIBUTION = '© OpenStreetMap contributors · © CARTO';
 
 type Props = {
