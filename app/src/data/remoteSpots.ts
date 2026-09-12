@@ -35,8 +35,9 @@ export async function saveNewSpot(input: {
   const id = `${input.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${Date.now()}`;
   const path = `gems/${id}.jpg`;
   const response = await fetch(input.photoUri);
-  const blob = await response.blob();
-  const { error: uploadError } = await supabase.storage.from('photos').upload(path, blob, {
+  if (!response.ok) throw new Error(`Could not read captured photo (${response.status})`);
+  const bytes = await response.arrayBuffer();
+  const { error: uploadError } = await supabase.storage.from('photos').upload(path, bytes, {
     contentType: 'image/jpeg',
     upsert: false,
   });
