@@ -100,7 +100,9 @@ export function SpotSheet({ spot, holdings, holdingsAvailable, position, onClose
           accessibilityRole="button"
           accessibilityState={{ disabled: !position || isTakingPhoto }}
         >
-          <Text style={styles.claimText}>{isTakingPhoto ? t('takingPhoto') : t('claim')}</Text>
+          <Text style={styles.claimText}>
+            {isTakingPhoto ? t('takingPhoto') : photoUri ? t('retakePhoto') : t('claim')}
+          </Text>
         </Pressable>
         {story ? (
           <Pressable

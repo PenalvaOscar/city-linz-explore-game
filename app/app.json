@@ -27,6 +27,13 @@
         {
           "locationWhenInUsePermission": "Zwergerl shows your position on the map and the distance to each spot."
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Zwergerl uses your camera to take a photo when you claim a spot.",
+          "photosPermission": "Zwergerl uses your photos to show captured claim photos."
+        }
       ]
     ]
   }

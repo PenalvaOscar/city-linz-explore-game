@@ -10,6 +10,7 @@ const strings = {
   headingUnknown: 'heading unknown',
   points: 'pts',
   claim: 'Claim this spot',
+  retakePhoto: 'Retake photo',
   takingPhoto: 'Taking photo…',
   cameraPermissionTitle: 'Camera access needed',
   cameraPermissionMessage: 'Allow camera access so you can take a proof photo for this claim.',
