@@ -1,15 +1,18 @@
 import type { PinState } from '../data/types';
 import type { HeadingBand } from '../verify/headingBand';
 
-// linz.at-inspired palette; hex values eyeballed from docs/design (see README there).
+// Palette from docs/design/app-mockup-colour-reference.jpg: linz.at blue, pink accent, yellow highlight.
 export const theme = {
-  primary: '#1E3FAE',
-  accentYellow: '#FFD500',
-  background: '#FAFAFC',
+  primary: '#2B44C2',
+  primaryDark: '#1E3FAE',
+  accentPink: '#E5007D',
+  pinkSoft: '#F9D3E4',
+  accentYellow: '#FFE45C',
+  background: '#F3F5FB',
   text: '#1A1A1A',
   muted: '#666666',
   white: '#FFFFFF',
-  surface: 'rgba(255,255,255,0.92)',
+  surface: 'rgba(255,255,255,0.94)',
   border: '#E3E6EE',
   badgePoints: '#FFF4B8',
   badgeOwnership: '#E8EDFB',
@@ -22,9 +25,9 @@ export const theme = {
 /** The only mapping from pin state to colour; components must not decide colours themselves. */
 export const pinColor: Record<PinState, string> = {
   free: '#9E9E9E',
-  mine: theme.primary,
-  theirs: '#D32F2F',
-  gem: '#7B1FA2',
+  mine: '#F5C400',
+  theirs: theme.primaryDark,
+  gem: theme.accentPink,
 };
 
 /** The only mapping from heading band to colour; the capture step looks colours up here. */

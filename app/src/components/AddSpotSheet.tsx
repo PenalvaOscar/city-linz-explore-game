@@ -55,7 +55,7 @@ export function AddSpotSheet({ position, onCreated, onClose }: Props) {
 }
 
 const styles = StyleSheet.create({
-  card: { position: 'absolute', left: 12, right: 12, bottom: 48, backgroundColor: theme.white, borderRadius: 16, padding: 14, gap: 10, elevation: 6 },
+  card: { position: 'absolute', left: 12, right: 12, bottom: 112, backgroundColor: theme.white, borderRadius: 22, padding: 14, gap: 10, elevation: 6 },
   title: { fontSize: 20, fontWeight: '700', color: theme.text },
   input: { borderWidth: 1, borderColor: theme.border, borderRadius: 10, padding: 10 },
   preview: { width: '100%', height: 180, borderRadius: 12 },
