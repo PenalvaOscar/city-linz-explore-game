@@ -46,7 +46,7 @@ export default function App() {
       </View>
       {selected && (
         <SpotSheet
-          key={selected.id}
+          key={`sheet-${selected.id}`}
           spot={selected}
           holdings={holdings}
           holdingsAvailable={available}
@@ -62,7 +62,7 @@ export default function App() {
       </View>
       {claiming && (
         <ClaimFlow
-          key={claiming.id}
+          key={`claim-${claiming.id}`}
           spot={claiming}
           player={player.name}
           setPlayer={player.setName}
