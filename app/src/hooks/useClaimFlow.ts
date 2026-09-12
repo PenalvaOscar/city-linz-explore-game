@@ -20,7 +20,8 @@ type Args = {
 
 /**
  * Drives the claim state machine: feeds it the dedicated position and heading watchers, a 1 s tick
- * while dwelling, and the `claim_spot` call while evaluating. Holds no rules of its own.
+ * while dwelling, the `claim_spot` call while evaluating, and the photo upload once the claim row
+ * exists. Holds no rules of its own.
  */
 export function useClaimFlow({ spot, player, thresholds, onClose, onSaved }: Args) {
   const [state, dispatch] = useReducer(transition, { spot, thresholds, hasName: player !== null }, initialClaimState);
@@ -57,7 +58,8 @@ export function useClaimFlow({ spot, player, thresholds, onClose, onSaved }: Arg
         if (cancelled) return;
         dispatch({ type: 'saved', ...saved });
         if (state.result?.pass) onSaved();
-        // Photo proof rides behind the result: a failed upload is logged and the claim stands.
+        // Photo proof for every saved attempt, passed or not, rides behind the result: a failed
+        // upload is logged and the claim stands.
         if (state.photoUri) {
           uploadClaimPhoto(saved.claimId, state.photoUri).catch((e) => console.warn('photo upload failed', e));
         }

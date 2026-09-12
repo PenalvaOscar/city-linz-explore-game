@@ -3,7 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import type { CaptureStepProps } from '../claim/CaptureStep';
 import { photos } from '../../data/photos';
-import { headingDiff, headingTurn } from '../../verify/geo';
+import { headingTurn } from '../../verify/geo';
 import { headingBand } from '../../verify/headingBand';
 import { t } from '../../ui/strings';
 import { bandColor, theme } from '../../ui/theme';
@@ -41,13 +41,13 @@ export function CameraCaptureStep({ spot, heading, thresholds, onCapture, onCanc
     }
   };
 
-  const denied = permission !== null && !permission.granted && !permission.canAskAgain;
+  // Android's first refusal leaves `canAskAgain` true; the status alone says whether we were refused.
+  const denied = permission?.status === 'denied';
 
   // The heading gate is skipped on a headless spot; otherwise the shutter follows the band.
   const gated = spot.heading !== null;
   const turn = spot.heading !== null && heading !== null ? headingTurn(heading, spot.heading) : null;
-  const diff = spot.heading !== null && heading !== null ? headingDiff(heading, spot.heading) : null;
-  const band = headingBand(diff, thresholds);
+  const band = headingBand(turn === null ? null : Math.abs(turn), thresholds);
   const facing = !gated || band === 'green';
   const locked = !ready || busy || !facing;
 
@@ -84,6 +84,7 @@ export function CameraCaptureStep({ spot, heading, thresholds, onCapture, onCanc
           <Text
             style={[styles.arrow, { color: bandColor[band], transform: [{ rotate: `${turn ?? 0}deg` }] }]}
             accessibilityElementsHidden
+            importantForAccessibility="no"
           >
             ↑
           </Text>
