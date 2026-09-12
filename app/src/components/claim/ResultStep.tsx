@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ClaimState } from '../../verify/claimMachine';
 import { gateFailureLines, outcomeLabel } from '../../verify/resultCopy';
 import { t } from '../../ui/strings';
@@ -16,12 +16,14 @@ type Props = {
 
 /** The passed, failed and saveError steps. */
 export function ResultStep({ state, player, onDone, onTryAgain, onRetrySave, onBack }: Props) {
-  const { step, spot, result, reading, saved, thresholds } = state;
+  const { step, spot, result, reading, saved, thresholds, photoUri } = state;
+  const photo = photoUri ? <Image source={{ uri: photoUri }} style={styles.photo} resizeMode="cover" /> : null;
 
   if (step === 'passed' && saved) {
     return (
       <View style={styles.container}>
         <Text style={[styles.title, styles.passed]}>{outcomeLabel(saved.previousOwner, player)}</Text>
+        {photo}
         <Text style={styles.spot}>{spot.name.en}</Text>
         <Text style={styles.points}>{t('pointsHeld', { points: spot.points })}</Text>
         <Pressable onPress={onDone} style={styles.primary} accessibilityRole="button">
@@ -50,6 +52,7 @@ export function ResultStep({ state, player, onDone, onTryAgain, onRetrySave, onB
   return (
     <View style={styles.container}>
       <Text style={[styles.title, styles.failed]}>{t('notThisTime')}</Text>
+      {photo}
       <Text style={styles.spot}>{spot.name.en}</Text>
       <View style={styles.lines}>
         {lines.map((line) => (
@@ -73,6 +76,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 30, fontWeight: '800', textAlign: 'center' },
   passed: { color: theme.success },
   failed: { color: theme.error },
+  photo: { width: 180, aspectRatio: 3 / 4, borderRadius: 12, backgroundColor: theme.border },
   spot: { fontSize: 18, color: theme.text },
   points: { fontSize: 22, fontWeight: '700', color: theme.primary },
   detail: { color: theme.muted, textAlign: 'center' },

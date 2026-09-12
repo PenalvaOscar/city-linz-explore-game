@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { claimSpot } from '../data/claimSpot';
+import { uploadClaimPhoto } from '../data/uploadClaimPhoto';
 import type { Spot } from '../data/types';
 import { initialClaimState, transition } from '../verify/claimMachine';
 import type { Thresholds } from '../verify/thresholds';
@@ -56,6 +57,10 @@ export function useClaimFlow({ spot, player, thresholds, onClose, onSaved }: Arg
         if (cancelled) return;
         dispatch({ type: 'saved', ...saved });
         if (state.result?.pass) onSaved();
+        // Photo proof rides behind the result: a failed upload is logged and the claim stands.
+        if (state.photoUri) {
+          uploadClaimPhoto(saved.claimId, state.photoUri).catch((e) => console.warn('photo upload failed', e));
+        }
       })
       .catch(() => {
         if (!cancelled) dispatch({ type: 'saveFailed' });

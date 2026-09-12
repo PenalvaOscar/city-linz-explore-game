@@ -1,23 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import type { CaptureStepProps } from '../claim/CaptureStep';
+import { photos } from '../../data/photos';
+import { headingDiff, headingTurn } from '../../verify/geo';
+import { headingBand } from '../../verify/headingBand';
 import { t } from '../../ui/strings';
-import { theme } from '../../ui/theme';
+import { bandColor, theme } from '../../ui/theme';
 
-const degrees = (h: number) => `${Math.round(h)}°`;
+const GHOST_OPACITY = 0.35;
 
 /**
  * The capture step of the claim flow (#10): asks for camera permission on entry, shows the back
- * camera and hands the JPEG's file URI to the flow. Verification stays in the flow; the shutter is
- * always available once the camera is ready.
+ * camera with the spot's reference photo ghosted over it, and a heading indicator that unlocks the
+ * shutter only when the phone faces the reference heading. Hands the JPEG's file URI to the flow.
  */
-export function CameraCaptureStep({ spot, heading, onCapture, onCancel }: CaptureStepProps) {
+export function CameraCaptureStep({ spot, heading, thresholds, onCapture, onCancel }: CaptureStepProps) {
   const [permission, requestPermission] = useCameraPermissions();
   const camera = useRef<CameraView>(null);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [ghost, setGhost] = useState(true);
 
   // Permission is asked the moment the step opens; `permission` is null until the status loads.
   useEffect(() => {
@@ -39,29 +43,60 @@ export function CameraCaptureStep({ spot, heading, onCapture, onCancel }: Captur
 
   const denied = permission !== null && !permission.granted && !permission.canAskAgain;
 
+  // The heading gate is skipped on a headless spot; otherwise the shutter follows the band.
+  const gated = spot.heading !== null;
+  const turn = spot.heading !== null && heading !== null ? headingTurn(heading, spot.heading) : null;
+  const diff = spot.heading !== null && heading !== null ? headingDiff(heading, spot.heading) : null;
+  const band = headingBand(diff, thresholds);
+  const facing = !gated || band === 'green';
+  const locked = !ready || busy || !facing;
+
+  let indicator: string;
+  if (!gated) indicator = t('captureTargetNone');
+  else if (turn === null) indicator = t('calibrateCompass');
+  else if (Math.round(Math.abs(turn)) === 0) indicator = t('onTarget');
+  else indicator = t(turn < 0 ? 'turnLeft' : 'turnRight', { degrees: Math.round(Math.abs(turn)) });
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{spot.name.en}</Text>
       <View style={styles.viewfinder}>
         {permission?.granted ? (
-          <CameraView ref={camera} style={StyleSheet.absoluteFill} facing="back" onCameraReady={() => setReady(true)} />
+          <>
+            <CameraView ref={camera} style={StyleSheet.absoluteFill} facing="back" onCameraReady={() => setReady(true)} />
+            {ghost ? (
+              <Image
+                source={photos[spot.photo]}
+                style={[StyleSheet.absoluteFill, styles.ghost]}
+                resizeMode="contain"
+              />
+            ) : null}
+            <Pressable onPress={() => setGhost((g) => !g)} style={styles.ghostToggle} accessibilityRole="button" hitSlop={8}>
+              <Text style={styles.ghostToggleText}>{t(ghost ? 'ghostHide' : 'ghostShow')}</Text>
+            </Pressable>
+          </>
         ) : (
           <Text style={styles.viewfinderText}>{denied ? t('cameraDenied') : t('cameraAsking')}</Text>
         )}
       </View>
-      <Text style={styles.reading}>
-        {heading === null ? t('captureHeadingNone') : t('captureHeading', { heading: degrees(heading) })}
-      </Text>
-      <Text style={styles.target}>
-        {spot.heading === null ? t('captureTargetNone') : t('captureTarget', { heading: degrees(spot.heading) })}
-      </Text>
+      <View style={styles.indicator}>
+        {gated ? (
+          <Text
+            style={[styles.arrow, { color: bandColor[band], transform: [{ rotate: `${turn ?? 0}deg` }] }]}
+            accessibilityElementsHidden
+          >
+            ↑
+          </Text>
+        ) : null}
+        <Text style={[styles.indicatorText, { color: bandColor[band] }]}>{indicator}</Text>
+      </View>
       {failed ? <Text style={styles.error}>{t('captureFailed')}</Text> : null}
       <Pressable
         onPress={shoot}
-        disabled={!ready || busy}
-        style={[styles.capture, (!ready || busy) && styles.captureDisabled]}
+        disabled={locked}
+        style={[styles.capture, locked && styles.captureDisabled]}
         accessibilityRole="button"
-        accessibilityState={{ disabled: !ready || busy }}
+        accessibilityState={{ disabled: locked }}
       >
         <Text style={styles.captureText}>{t('capture')}</Text>
       </Pressable>
@@ -85,8 +120,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   viewfinderText: { color: theme.white, textAlign: 'center', padding: 24 },
-  reading: { fontSize: 28, fontWeight: '800', color: theme.primary },
-  target: { color: theme.muted },
+  ghost: { opacity: GHOST_OPACITY },
+  ghostToggle: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: theme.backdrop,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  ghostToggleText: { color: theme.white, fontWeight: '700', fontSize: 13 },
+  indicator: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 44 },
+  arrow: { fontSize: 36, fontWeight: '800', lineHeight: 40 },
+  indicatorText: { fontSize: 18, fontWeight: '700', flexShrink: 1 },
   error: { color: theme.error },
   capture: {
     marginTop: 12,

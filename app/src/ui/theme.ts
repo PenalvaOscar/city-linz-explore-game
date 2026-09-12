@@ -1,4 +1,5 @@
 import type { PinState } from '../data/types';
+import type { HeadingBand } from '../verify/headingBand';
 
 // linz.at-inspired palette; hex values eyeballed from docs/design (see README there).
 export const theme = {
@@ -24,4 +25,12 @@ export const pinColor: Record<PinState, string> = {
   mine: theme.primary,
   theirs: '#D32F2F',
   gem: '#7B1FA2',
+};
+
+/** The only mapping from heading band to colour; the capture step looks colours up here. */
+export const bandColor: Record<HeadingBand, string> = {
+  green: theme.success,
+  amber: '#F9A825',
+  red: theme.error,
+  none: '#9E9E9E',
 };

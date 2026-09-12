@@ -52,6 +52,7 @@ export function ClaimFlow({ spot, player, setPlayer, thresholds, onClose, onDone
         <CameraCaptureStep
           spot={spot}
           heading={state.heading}
+          thresholds={thresholds}
           onCapture={(photoUri) => dispatch({ type: 'capture', photoUri })}
           onCancel={abandon}
         />
