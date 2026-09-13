@@ -114,6 +114,7 @@ Compass bearings wrap around. For example, `350°` and `10°` are 20° apart:
 
 ```ts
 Math.abs(((a - b + 540) % 360) - 180)
+```
 
 ---
 
