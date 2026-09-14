@@ -23,7 +23,7 @@ prior written permission from the copyright holder.
 To request permission to use the code, part of the code, documentation, design,
 data, visual assets, or any other project-related material, contact:
 
-Email: [eiman.swe@gmail.com]
+Email: [eiman.swe@gmail.com] [oscarpenalva@gmail.com]
 
 A permission request should describe:
 
