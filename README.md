@@ -124,6 +124,6 @@ This repository is publicly available for viewing and evaluation only. The
 code, documentation, design, data, and related project materials may not be
 copied, reused, modified, or distributed without prior written permission.
 
-For permission requests, contact: **[eiman.swe@gmail.com]**
+For permission requests, contact: **[eiman.swe@gmail.com]** **[oscarpenalva@gmail.com]** 
 
 See [`LICENSE.md`](LICENSE.md) for the full terms.
