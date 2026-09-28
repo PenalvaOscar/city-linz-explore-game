@@ -79,8 +79,13 @@ describe('claim machine: dwell', () => {
     expect(s.dwellS).toBe(0);
     expect(run(s, [at(5), ...ticks(9)]).step).toBe('dwelling');
   });
+  it('requires the PRD dwell of 10 s by default, so the dwell gate is real', () => {
+    expect(DEFAULT_THRESHOLDS.dwellMinS).toBe(10);
+    const s = transition(initialClaimState({ spot, thresholds: DEFAULT_THRESHOLDS, hasName: true }), at(5));
+    expect(s.step).toBe('dwelling');
+  });
   it('skips dwelling and unlocks the camera at once when no dwell is required', () => {
-    const noDwell = initialClaimState({ spot, thresholds: DEFAULT_THRESHOLDS, hasName: true });
+    const noDwell = initialClaimState({ spot, thresholds: { ...DEFAULT_THRESHOLDS, dwellMinS: 0 }, hasName: true });
     const s = transition(noDwell, at(5));
     expect(s.step).toBe('camera');
     expect(s.dwellS).toBe(0);
@@ -88,9 +93,10 @@ describe('claim machine: dwell', () => {
   it('resets when the accuracy degrades mid-dwell', () => {
     expect(run(start, [at(5), ...ticks(6), at(5, 90)]).dwellS).toBe(0);
   });
-  it('unlocks after 2 s with relaxed thresholds, from anywhere, ignoring accuracy', () => {
+  it('unlocks after the 10 s dwell with relaxed thresholds, from anywhere, ignoring accuracy', () => {
     const relaxed = initialClaimState({ spot, thresholds: RELAXED_THRESHOLDS, hasName: true });
-    expect(run(relaxed, [at(3000, 500), ...ticks(2)]).step).toBe('camera');
+    expect(run(relaxed, [at(3000, 500), ...ticks(9)]).step).toBe('dwelling');
+    expect(run(relaxed, [at(3000, 500), ...ticks(10)]).step).toBe('camera');
   });
 });
 

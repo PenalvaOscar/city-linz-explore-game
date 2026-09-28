@@ -94,10 +94,15 @@ describe('evaluateClaim: heading availability', () => {
 });
 
 describe('evaluateClaim: relaxed thresholds', () => {
-  it('passes from far away with poor accuracy and a short dwell', () => {
-    const r = evaluateClaim(spot, { position: metresSouth(3000), accuracyM: 500, heading: 30, dwellS: 2 }, RELAXED_THRESHOLDS);
+  it('passes from far away with poor accuracy once the dwell is served', () => {
+    const r = evaluateClaim(spot, { position: metresSouth(3000), accuracyM: 500, heading: 30, dwellS: 10 }, RELAXED_THRESHOLDS);
     expect(r.pass).toBe(true);
     expect(r.gates).toEqual({ distance: 'pass', accuracy: 'pass', heading: 'pass', dwell: 'pass' });
+  });
+  it('still enforces the dwell', () => {
+    const r = evaluateClaim(spot, { position: metresSouth(3000), accuracyM: 500, heading: 30, dwellS: 2 }, RELAXED_THRESHOLDS);
+    expect(r.pass).toBe(false);
+    expect(r.gates.dwell).toBe('fail');
   });
   it('still enforces the heading', () => {
     const r = evaluateClaim(spot, { position: metresSouth(3000), accuracyM: 500, heading: 200, dwellS: 2 }, RELAXED_THRESHOLDS);

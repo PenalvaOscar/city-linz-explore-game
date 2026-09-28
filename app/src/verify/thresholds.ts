@@ -20,8 +20,8 @@ export const DEFAULT_THRESHOLDS: Thresholds = {
   accuracyMaxM: 60,
   headingPassDeg: 35,
   headingReviewDeg: 60,
-  /** 0: the camera unlocks as soon as the player is in range. */
-  dwellMinS: 0,
+  /** PRD "Verification thresholds": the camera unlocks after 10 s within range. */
+  dwellMinS: 10,
 };
 
 /** Desk development (`EXPO_PUBLIC_RELAXED_GATES`): distance unlimited, no accuracy wait, heading still enforced. */
