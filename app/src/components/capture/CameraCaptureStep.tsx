@@ -112,8 +112,11 @@ export function CameraCaptureStep({ spot, heading, thresholds, onCapture, onCanc
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', padding: 24, gap: 12 },
   title: { fontSize: 22, fontWeight: '700', color: theme.text },
+  // #22: the only shrinkable child of container, so on short screens (667pt and below) it gives height back
+  // and narrows with the ratio instead of pushing the shutter and Back to map off-screen.
   viewfinder: {
     width: '100%',
+    flexShrink: 1,
     aspectRatio: 3 / 4,
     borderRadius: 12,
     overflow: 'hidden',
