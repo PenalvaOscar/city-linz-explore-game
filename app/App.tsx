@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ClaimFlow } from './src/components/claim/ClaimFlow';
+import { AuthScreen } from './src/components/AuthScreen';
 import { MAP_ATTRIBUTION, SpotMap } from './src/components/SpotMap';
 import { SpotSheet } from './src/components/SpotSheet';
 import { AddSpotSheet } from './src/components/AddSpotSheet';
@@ -13,6 +14,7 @@ import { seasonStatus } from './src/data/season';
 import type { Spot } from './src/data/types';
 import { useHoldings } from './src/hooks/useHoldings';
 import { usePlayer } from './src/hooks/usePlayer';
+import type { PlayerState } from './src/hooks/usePlayer';
 import { usePosition } from './src/hooks/usePosition';
 import { createClock } from './src/verify/clock';
 import { applyDecay } from './src/verify/decay';
@@ -27,6 +29,31 @@ const thresholds = process.env.EXPO_PUBLIC_RELAXED_GATES ? RELAXED_THRESHOLDS : 
 const clock = createClock(process.env.EXPO_PUBLIC_DEMO_NOW, Date.now);
 
 export default function App() {
+  const player = usePlayer();
+
+  if (!player.loaded) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator color={theme.primary} size="large" />
+        <Text style={styles.loadingText}>{t('authLoading')}</Text>
+        <StatusBar style="dark" />
+      </View>
+    );
+  }
+
+  if (!player.authenticated) {
+    return (
+      <>
+        <AuthScreen initialError={player.authError} />
+        <StatusBar style="dark" />
+      </>
+    );
+  }
+
+  return <GameApp player={player} />;
+}
+
+function GameApp({ player }: { player: PlayerState }) {
   const [selected, setSelected] = useState<Spot | null>(null);
   const [claiming, setClaiming] = useState<Spot | null>(null);
   const [addingSpot, setAddingSpot] = useState(false);
@@ -36,7 +63,6 @@ export default function App() {
   // Decay is applied once here, at the time of each holdings read; everything below sees only live holdings.
   const holdings = useMemo(() => applyDecay(rawHoldings, clock.now()), [rawHoldings]);
   const { granted, denied, position } = usePosition();
-  const player = usePlayer();
   const me = player.name ?? '';
   const myPoints = holdings.filter((h) => h.player === me).reduce((sum, h) => sum + h.points, 0);
   const mySpots = holdings.filter((h) => h.player === me).length;
@@ -95,6 +121,19 @@ export default function App() {
               <Text style={styles.streakValue}>{myPoints} Pkt</Text>
               <Text style={styles.streakLabel}>{mySpots} Spots</Text>
             </View>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              player.signOut().catch((error: unknown) => {
+                Alert.alert(t('signOut'), error instanceof Error ? error.message : t('authGenericError'));
+              });
+            }}
+            style={styles.signOut}
+            accessibilityRole="button"
+            accessibilityLabel={t('signOut')}
+            hitSlop={8}
+          >
+            <Ionicons name="log-out-outline" size={21} color={theme.primary} />
           </Pressable>
         </View>
       </View>
@@ -173,6 +212,8 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, backgroundColor: theme.background },
+  loadingText: { color: theme.muted },
   container: { flex: 1, backgroundColor: theme.background },
   header: {
     position: 'absolute',
@@ -189,7 +230,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
   },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   brand: { flex: 1 },
   wordmark: { color: theme.primary, fontWeight: '900', fontSize: 26, letterSpacing: 1 },
   tagline: { color: theme.primary, fontSize: 13, marginTop: 1, fontWeight: '600' },
@@ -204,6 +245,16 @@ const styles = StyleSheet.create({
   },
   streakValue: { color: theme.primary, fontWeight: '800', fontSize: 14, lineHeight: 16 },
   streakLabel: { color: theme.primary, fontSize: 11, lineHeight: 13 },
+  signOut: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: theme.border,
+    borderRadius: 20,
+    backgroundColor: theme.white,
+  },
   addSpot: {
     position: 'absolute',
     top: 130,

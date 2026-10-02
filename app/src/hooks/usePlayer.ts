@@ -1,54 +1,71 @@
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { newDeviceId } from '../verify/deviceId';
-
-const PLAYER_NAME_KEY = 'zwergerl.playerName';
-const PLAYER_ID_KEY = 'zwergerl.playerId';
+import { supabase } from '../../utils/supabase';
 
 export type PlayerState = {
-  /** The stored display name; null until loaded or while none is stored. */
   name: string | null;
-  /**
-   * Random device-local identifier, generated on first launch and kept for the device's lifetime.
-   * Not sent anywhere yet: it is here so every device carries a stable id before the backend
-   * gains a `player_id` column. Null until loaded.
-   */
   id: string | null;
-  /** False until the stored name and id have been read once. */
+  email: string | null;
+  authError: string | null;
+  authenticated: boolean;
   loaded: boolean;
   setName: (name: string) => Promise<void>;
+  signOut: () => Promise<void>;
 };
 
-/** The device-local player identity: one display name, asked once, and one random id, both kept in AsyncStorage. */
+/** Keeps the game player identity in sync with the signed-in Supabase account. */
 export function usePlayer(): PlayerState {
   const [name, setNameState] = useState<string | null>(null);
   const [id, setId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-    AsyncStorage.multiGet([PLAYER_NAME_KEY, PLAYER_ID_KEY])
-      .then(([[, storedName], [, storedId]]) => {
-        // The id is written even when the effect was cancelled so the first launch always persists one.
-        const deviceId = storedId ?? newDeviceId();
-        if (!storedId) AsyncStorage.setItem(PLAYER_ID_KEY, deviceId).catch(() => {});
-        if (cancelled) return;
-        if (storedName) setNameState(storedName);
-        setId(deviceId);
+    let active = true;
+    const applyUser = (user: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null) => {
+      if (!active) return;
+      setAuthError(null);
+      setId(user?.id ?? null);
+      setEmail(user?.email ?? null);
+      const displayName = user?.user_metadata?.display_name;
+      setNameState(typeof displayName === 'string' && displayName.trim() ? displayName.trim() : null);
+      setLoaded(true);
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      applyUser(session?.user ?? null);
+    });
+
+    supabase.auth.getSession()
+      .then(({ data, error }) => {
+        if (error) throw error;
+        applyUser(data.session?.user ?? null);
       })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoaded(true);
+      .catch((cause: unknown) => {
+        if (!active) return;
+        setAuthError(cause instanceof Error ? cause.message : 'Could not restore the saved account session.');
+        setLoaded(true);
       });
+
     return () => {
-      cancelled = true;
+      active = false;
+      subscription.unsubscribe();
     };
   }, []);
 
   const setName = useCallback(async (next: string) => {
-    setNameState(next);
-    await AsyncStorage.setItem(PLAYER_NAME_KEY, next).catch(() => {});
+    const displayName = next.trim();
+    if (!displayName) throw new Error('Display name cannot be empty.');
+    const { data, error } = await supabase.auth.updateUser({ data: { display_name: displayName } });
+    if (error) throw error;
+    const savedName = data.user.user_metadata.display_name;
+    setNameState(typeof savedName === 'string' ? savedName : displayName);
   }, []);
 
-  return { name, id, loaded, setName };
+  const signOut = useCallback(async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  }, []);
+
+  return { name, id, email, authError, authenticated: id !== null, loaded, setName, signOut };
 }

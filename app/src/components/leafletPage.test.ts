@@ -36,10 +36,13 @@ describe('buildLeafletPage', () => {
     expect(html).toContain('"color":"#7B1FA2","outline":"#E5007D"');
     expect(html).toContain('pinIcon(p.color, p.outline, p.arrow, p.gem)');
   });
-  it('uses CARTO Voyager tiles, not OpenStreetMap standard, without browser geolocation', () => {
-    expect(html).toContain('basemaps.cartocdn.com/rastertiles/voyager/');
+  it('uses CARTO Positron tiles to match the muted iOS basemap, without browser geolocation', () => {
+    expect(html).toContain('basemaps.cartocdn.com/rastertiles/light_all/');
     expect(html).not.toContain('tile.openstreetmap.org');
     expect(html).not.toContain('navigator.geolocation');
+  });
+  it('fills the complete pin silhouette with its state color', () => {
+    expect(html).toContain(`fill="' + color + '" fill-opacity="1" stroke="' + outline + '"`);
   });
   it('pins the Leaflet assets with subresource integrity', () => {
     expect(html).toContain('integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="');

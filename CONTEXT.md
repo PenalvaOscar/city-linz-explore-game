@@ -28,8 +28,8 @@ _Avoid_: direction, orientation, bearing
 ### Play
 
 **Player**:
-A person using the app, identified by a device-local id and a display name. No account.
-_Avoid_: user, account
+A person using the app, authenticated with an email/password account and identified in the game by the account's saved display name.
+_Avoid_: user
 
 **Claim**:
 The act of standing at a spot and taking a photo that passes verification. A claim on a free spot makes you its owner; a claim on an owned spot is a steal.
