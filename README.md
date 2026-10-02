@@ -61,9 +61,9 @@ Players can also create a new spot from the map. They provide a name and take a 
 - **Expo Location** for GPS position and accuracy
 - **React Native Maps** on iOS
 - **Leaflet in a React Native WebView** on Android
-- CARTO Positron tiles with OpenStreetMap attribution on Android
+- Muted Apple Maps styling on iOS and matching CARTO Positron tiles with OpenStreetMap attribution on Android
 - **Supabase** for shared claims, holdings, leaderboard data, spot records, and photo storage
-- **AsyncStorage** for device-local player identity
+- **Supabase Auth** for email/password accounts; AsyncStorage persists the auth session locally
 - **Jest with jest-expo** for automated tests
 
 The app entry point is `app/App.tsx`. It runs in Expo Go during development and is designed for physical Android and iOS devices.
@@ -81,10 +81,30 @@ There is currently no web export, Vercel deployment, Expo Router, or `react-leaf
 - `app/src/components/LeaderboardSheet.tsx` — leaderboard display
 - `app/src/components/AddSpotSheet.tsx` — new spot creation flow
 - `app/src/data/` — bundled data, Supabase access, claims, and photo uploads
-- `app/src/hooks/` — GPS, compass, player identity, claim flow, and holdings state
+- `app/src/hooks/` — GPS, compass, authenticated player identity, claim flow, and holdings state
 - `app/src/verify/` — pure verification, leaderboard, decay, season, and map-state logic
 - `supabase/schema.sql` — complete database setup for a new Supabase project
 - `supabase/migrations/` — incremental database migrations
+
+---
+
+## Accounts and Supabase setup
+
+Players register and sign in with email and password on Android and iOS. Registration
+also requires a display name, which is saved in Supabase Auth user metadata and used
+for claims and leaderboard entries. Enable the Email provider in Supabase Authentication
+settings. If email confirmation is enabled, players must confirm their address before
+they can sign in.
+
+For a new Supabase project, run `supabase/schema.sql`. For an existing project, apply
+the migrations in `supabase/migrations/`, including
+`20261002160000_require_authenticated_access.sql`. It replaces anonymous access with
+authenticated access. The photos bucket remains public for image reads, while uploads
+require a signed-in account.
+
+The current hackathon policies allow any authenticated player to read and write shared
+game data. They do not enforce per-account ownership or prevent a player from changing
+another player's records; add per-player authorization before production use.
 
 ---
 
@@ -106,7 +126,7 @@ The default thresholds are:
 - Distance: up to 40 metres
 - GPS accuracy: 60 metres or better
 - Heading difference: up to 35 degrees
-- Dwell threshold: currently 0 seconds in the default app configuration, so the camera unlocks as soon as the distance and accuracy gates pass
+- Dwell threshold: 10 seconds within range before the camera unlocks
 
 The verification logic is implemented in pure TypeScript and covered by automated tests.
 

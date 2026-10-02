@@ -35,7 +35,7 @@ The city and the festival publish data, not reasons to go anywhere. Everyone wal
 ### Day 2 (tomorrow, 09:30–14:00) — the loop
 
 - Claim flow: distance gate → dwell → heading gate → capture photo → result screen.
-- Player identity: device id + display name, local storage.
+- Player identity: Supabase email/password account with a display name saved in account metadata.
 - Shared ownership + leaderboard (Supabase hosted, ADR-0003).
 - Steal and reclaim.
 - Gems from festival calendar with a demo time override.
@@ -44,7 +44,7 @@ The city and the festival publish data, not reasons to go anywhere. Everyone wal
 ### Not in the hackathon
 
 - AI image comparison (ADR-0002).
-- Accounts, auth, push notifications.
+- Push notifications.
 - Decay job (client-side computed; cannot fire within the hackathon).
 - Live Linz open-data queries (data.linz.gv.at); Linz spots are hand-picked.
 - German UI; the data schema is bilingual, the content is EN.

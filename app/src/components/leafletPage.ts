@@ -52,8 +52,9 @@ export function buildLeafletPage({ pins, bounds, playerColor, gemColor }: PageIn
   // A failed CDN load (venue Wi-Fi) would otherwise reproduce the blank map this page replaces, silently.
   window.onerror = function (message) { post({ type: 'error', message: String(message) }); };
   var map = L.map('map', { attributionControl: false, zoomControl: false });
-  // URL template per CARTO's basemap-styles README; Leaflet fills {r} with "@2x" on retina screens.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+  // Positron keeps Android's basemap as muted as iOS's mutedStandard map.
+  // Leaflet fills {r} with "@2x" on retina screens.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19 }).addTo(map);
   map.fitBounds(${inlineJson(bounds)});
   map.on('click', function () { post({ type: 'deselect' }); });
 
@@ -69,7 +70,7 @@ export function buildLeafletPage({ pins, bounds, playerColor, gemColor }: PageIn
       iconSize: [26, 36],
       iconAnchor: [13, 36],
       html: '<svg class="pin" viewBox="0 0 26 36" xmlns="http://www.w3.org/2000/svg">' +
-        '<path d="M13 0C5.8 0 0 5.8 0 13c0 9.5 13 23 13 23s13-13.5 13-23C26 5.8 20.2 0 13 0z" fill="' + color + '" stroke="' + outline + '" stroke-width="1.5"/>' +
+        '<path d="M13 0C5.8 0 0 5.8 0 13c0 9.5 13 23 13 23s13-13.5 13-23C26 5.8 20.2 0 13 0z" fill="' + color + '" fill-opacity="1" stroke="' + outline + '" stroke-width="1.5"/>' +
         centre + (gem ? gemMarker : '') + '</svg>'
     });
   };

@@ -1,6 +1,7 @@
 -- Zwergerl hackathon schema
 -- Paste the whole file into Supabase → SQL Editor → Run.
--- Safe to re-run: drops and recreates everything.
+-- Destructive reset: this script drops and recreates game tables. Do not rerun
+-- against a project whose data you need to keep; use migrations instead.
 
 create extension if not exists pgcrypto;
 
@@ -22,7 +23,7 @@ create table spots (
 );
 
 alter table spots enable row level security;
-create policy spots_open on spots for all using (true) with check (true);
+create policy spots_authenticated on spots for all to authenticated using (true) with check (true);
 
 -- ---------------------------------------------------------------
 -- claims: every attempt, passed or failed. This is your real data.
@@ -74,15 +75,21 @@ group by player
 order by points desc;
 
 -- ---------------------------------------------------------------
--- Open access. There is no auth in this build, so RLS must allow
--- anonymous reads and writes or every insert fails silently.
--- This is fine for one day. Do not ship it.
+-- Hackathon access: any signed-in player can read and write shared game data.
+-- Production should add per-player ownership policies and server-side validation.
 -- ---------------------------------------------------------------
 alter table claims   enable row level security;
 alter table holdings enable row level security;
 
-create policy claims_open   on claims   for all using (true) with check (true);
-create policy holdings_open on holdings for all using (true) with check (true);
+create policy claims_authenticated on claims
+  for all to authenticated using (true) with check (true);
+create policy holdings_authenticated on holdings
+  for all to authenticated using (true) with check (true);
+grant select, insert, update, delete on spots to authenticated;
+grant select, insert, update on claims to authenticated;
+grant select, insert, update, delete on holdings to authenticated;
+grant select on leaderboard to authenticated;
+revoke all on spots, claims, holdings, leaderboard from anon;
 
 -- ---------------------------------------------------------------
 -- claim_spot: the one write path of the claim flow.
@@ -130,18 +137,20 @@ begin
 end;
 $$;
 
-grant execute on function claim_spot(text, text, integer, boolean, real, real, real, integer) to anon, authenticated;
+revoke all on function claim_spot(text, text, integer, boolean, real, real, real, integer) from public, anon;
+grant execute on function claim_spot(text, text, integer, boolean, real, real, real, integer) to authenticated;
 
 -- ---------------------------------------------------------------
--- Photo storage: public bucket "photos", anonymous upload allowed.
+-- Photo storage: public bucket "photos"; only authenticated players may upload or update.
 -- ---------------------------------------------------------------
 insert into storage.buckets (id, name, public)
 values ('photos', 'photos', true)
 on conflict (id) do update set public = true;
 
 drop policy if exists photos_open on storage.objects;
-create policy photos_open on storage.objects
-  for all using (bucket_id = 'photos') with check (bucket_id = 'photos');
+drop policy if exists photos_authenticated on storage.objects;
+create policy photos_authenticated on storage.objects
+  for all to authenticated using (bucket_id = 'photos') with check (bucket_id = 'photos');
 
 -- ---------------------------------------------------------------
 -- Two demo rows (real spot ids) so the map and leaderboard are
